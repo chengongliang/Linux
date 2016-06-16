@@ -1,0 +1,32 @@
+#!/bin/bash
+source /etc/profile
+
+remote=172.16.8.5
+wwwdir=/home/wwwroot
+
+#read -p "please input remoteserver:" remote
+
+usage(){
+        echo """
+        ${0} ${jump/order/resource/setting/upgrade/video/witkey/www/wx}
+        input like:
+                ${0} upgrade #<= this will rsync upgrade.iclassedu.com =># 
+                or
+                ${0} www #<= this will rsync www.iclassedu.com =>#
+                . 
+        """
+}
+
+rsync(){
+        /usr/bin/rsync -apv  $remote:$wwwdir/$SRC.iclassedu.com/ $wwwdir/$DST.iclassedu.com/
+}
+
+case ${1} in
+        resource ) SRC=$iresource && DST=${1} && rsync;;
+        www ) SRC=${1} && DST=${1} && rsync;;
+        support ) SRC=${1} && DST=${1} && rsync;;
+        upgrade ) SRC=${1} && DST=${1} && rsync;;
+        video ) SRC=${1} && DST=${1} && rsync;;
+        wx ) SRC=${1} && DST=${1} && rsync;;
+        * )  usage 2>&1;;
+esac
