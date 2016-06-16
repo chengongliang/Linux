@@ -15,7 +15,7 @@ usage(){
 }
 
 rsync(){   
-	/sbin/runuser -l root -c "/usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remoteserver:/home/worker/$workername /home/"
+	/usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remoteserver:/home/worker/$workername /home/
 	restartworker
 }
 
