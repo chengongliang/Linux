@@ -1,0 +1,40 @@
+#!/bin/bash
+source /etc/profile
+set -e
+#read -p "please input remoteserver:" remoteserver
+remoteserver=172.16.8.5
+usage(){
+	echo"""
+        ${0} ${bee/frontend/workallocation/dataauto/sendserver/vanning/taskmanager}
+        include :(bee/frontend/workallocation/dataauto/sendserver/vanning/taskmanager)
+        input like:
+                ${0} bee #<= this will rsync tem-bee-worker =>#
+                ${0} frontend #<= this will rsync tem-frontend-worker =># 
+                ${0} workallocation  #<= this will rsync tem-support-workAllocation =>#
+        """
+}
+
+rsync(){   
+	/sbin/runuser -l root -c "/usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remoteserver:/home/worker/$workername /home/"
+	restartworker
+}
+
+restartworker(){
+        cd /home/${workername} || exit 15
+        bash bin/start-worker.sh stop
+        echo "wait kafka disconnect"
+        sleep 35
+        cd /home/${workername} || exit 15
+        bash bin/start-worker.sh start
+}
+
+case ${1} in
+        bee) workername=tem-bee-worker && rsync;;
+        frontend) workername=tem-frontend-worker && rsync ;;
+        workallocation) workername=tem-support-workAllocation && rsync ;;
+        dataauto) workername=tem-DataAutomation-worker && rsync ;;
+        sendserver) workername=tem-support-sendServer && rsync ;;
+	vanning) workername=tem-hyw-vanning && rsync ;;
+	taskmanager) workername=tem-hyw-taskManager && rsync ;;
+        *) usage;;
+esac
