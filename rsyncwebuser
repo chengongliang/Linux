@@ -9,7 +9,7 @@ tomhome=/home/webuser
 usage(){
     echo """
     ${0} ${auth/frontend/officesupport/resource/service/support}
-	  include :(auth/frontend/officeSupport/resource/service/support)
+    include :(auth/frontend/officeSupport/resource/service/support)
     input like:
       ${0} auth #<= this will rsync auth =>#
       ${0} resource #<= this will rsync resourceManger =># 
@@ -32,20 +32,20 @@ starttem(){
 }
 
 rsync(){
-    /sbin/runuser -l root -c "/usr/bin/rsync -apv --delete --exclude=spring --exclude='*.xml' --exclude='*.properties' $remote:$tomhome/$SRC/$webappdir/ $tomhome/$temname/$webappdir/"
+    /usr/bin/rsync -apv --delete --exclude=spring --exclude='*.xml' --exclude='*.properties' $remote:$tomhome/$SRC/$webappdir/ $tomhome/$temname/$webappdir/
     stoptem
-  	starttem
+    starttem
 }
 
 
 case ${1} in
-	  auth) SRC=auth && temname=tem-auth-1 && webappdir=webapps/tem-auth-rest && rsync ;;
-	  frontend) SRC=frontend && temname=tem-frontend-1 && webappdir=webapps/tem-rest-frontend && rsync ;;
-	  setting) SRC=tem-setting-1 && temname=tem-setting-1 && webappdir=webapps/tem-rest-officeSupport && rsync ;;
+    auth) SRC=auth && temname=tem-auth-1 && webappdir=webapps/tem-auth-rest && rsync ;;
+    frontend) SRC=frontend && temname=tem-frontend-1 && webappdir=webapps/tem-rest-frontend && rsync ;;
+    setting) SRC=tem-setting-1 && temname=tem-setting-1 && webappdir=webapps/tem-rest-officeSupport && rsync ;;
     resource) SRC=resourceManger && temname=tem-resource-1 && webappdir=webapps/tem-rest-resourceManager && rsync ;;
-	  support)SRC==support.iclassedu.com-1&& temname=support.iclassedu.com-1 && webappdir=webapps/Service_platform && rsync ;;
-  	order) SRC=support && temname=tem-order-1 && webappdir=webapps/tem-rest-support && rsync ;;
-	  witkey) SRC=tem-witkey-1 && temname=tem-witkey-1 && webappdir=webapps/tem-rest-crowdsourcing &&  rsync;;
-	  track ) SRC=flow_tracking && temname=track.iclassedu.com && webappdir=webapps/flow_tracking && rsync;;	
+    support)SRC==support.iclassedu.com-1&& temname=support.iclassedu.com-1 && webappdir=webapps/Service_platform && rsync ;;
+    order) SRC=support && temname=tem-order-1 && webappdir=webapps/tem-rest-support && rsync ;;
+    witkey) SRC=tem-witkey-1 && temname=tem-witkey-1 && webappdir=webapps/tem-rest-crowdsourcing &&  rsync;;
+    track ) SRC=flow_tracking && temname=track.iclassedu.com && webappdir=webapps/flow_tracking && rsync;;	
     * )  usage 2>&1;;
 esac
