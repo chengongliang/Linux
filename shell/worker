@@ -1,0 +1,76 @@
+source /etc/profile 2>&1>/dev/null
+set -e
+#read -p "please input remoteserver:" remoteserver
+remoteserver=172.16.8.5
+usage(){
+    echo -e """    include : bee/frontend/workallocation/dataauto/sendserver/vanning/taskmanager
+    command : rsync/start/restart/stop/status/log
+    \033[32m${0} bee rsync\033[0m <= this will rsync tem-bee-worker from $remoteserver =>
+    \033[32m${0} bee stop\033[0m  <= this will stop tem-frontend-worker =>
+    \033[32m${0} bee log\033[0m   <= this will tailf *.out =>
+    """
+}
+
+rsync(){   
+    /usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remoteserver:/home/worker/$workername /home/
+    restartworker
+}
+
+startworker(){
+    cd /home/$workername || exit 15
+    bash bin/start-worker.sh start
+}
+
+stopworker(){
+    cd /home/$workername || exit 15
+    bash bin/start-worker.sh stop
+}
+
+status(){
+    cd /home/$workername || exit 15
+    bash bin/start-worker.sh status
+}
+
+restartworker(){
+    stopworker
+    echo -e "\033[33mwait 35s for kafka disconnect !\033[0m"
+    sleep 35
+    startworker
+}
+
+log(){
+    tailf /home/$workername/logs/*.out
+}
+
+case $1 in
+    bee) workername=tem-bee-worker ;;
+    hbee) workername=tem-hbee-worker ;;
+    frontend) workername=tem-frontend-worker ;;
+    workallocation) workername=tem-support-workAllocation ;;
+    dataauto) workername=tem-DataAutomation-worker ;;
+    demoauto) workername=tem-DemoDataauto-worker ;;
+    sendserver) workername=tem-support-sendServer ;;
+    vanning) workername=tem-hyw-vanning ;;
+    taskmanager) workername=tem-hyw-taskManager ;;
+    *) usage ;;
+esac
+
+if [ -z $1 ];then
+    exit
+fi
+
+if [ -z $2 ];then
+    echo -e "\033[35mPlease enter command rsync|restart|start|stop|status|log\033[0m"
+    elif [ "$2" = "restart" ];then
+        restartworker
+    elif [ "$2" = "stop" ];then
+        stopworker
+    elif [ "$2" = "start" ];then
+        startworker
+    elif [ "$2" = "status" ];then
+        status
+    elif [ "$2" = "rsync" ];then
+        rsync
+    elif [ "$2" = "log" ];then
+        log
+fi

@@ -58,7 +58,7 @@ case $1 in
 esac
 
 if [ -z $2 ];then
-    echo -e "\033[35mPlease enter command rsync|restart|start|stop\033[0m"
+    echo -e "\033[35mPlease enter command rsync|restart|start|stop|log\033[0m"
     elif [ "$2" = "restart" ];then
         stoptem
         starttem
