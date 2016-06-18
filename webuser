@@ -1,0 +1,73 @@
+#!/bin/bash
+source /etc/profile
+set -e
+remote=172.16.8.7
+tomhome=/home/webuser
+
+#read -p "please input remoteserver:" remote
+
+usage(){
+    echo -e """
+    ${0} ${auth/frontend/setting/witkey/track/resource/service/support}
+    include : auth/frontend/setting/witkey/track/resource/service/support
+    input like:
+    \033[32m${0} auth rsync <= this will rsync tem-auth =>\033[0m
+    \033[32m${0} auth stop  <= this will stop tem-auth =>\033[0m
+    \033[32m${0} auth log   <= this will tailf catalina.out =>\033[0m
+    """
+}
+
+stoptem(){
+    PID=$(jps -v|grep -v grep|grep $temname|awk '{print $1}')
+    (test ! -z "$PID" &&
+    echo -e "\033[35m stop $temname pid:$PID \033[0m" &&
+    kill -9 $PID
+    )|| echo -e "\033[33m $temname not running \033[0m"
+}
+
+starttem(){
+    if [ -z $(`ps -ef|grep -v grep |grep $temname`) ];then
+        bash $tomhome/$temname/bin/startup.sh 2>&1 >/dev/null
+        PID2=$(jps -v|grep -v grep|grep ${tomhome}/${temname}|awk '{print $1}')
+        echo -e "\033[32m start ${temname} pid:${PID2} \033[0m"
+    else
+        echo -e "\033[35m $temname has already started !\033[0m"
+    fi
+}
+
+log(){
+    tailf $tomhome/$temname/logs/catalina.out
+}
+
+Rsync(){
+    /usr/bin/rsync -apv --delete --exclude=spring --exclude='*.xml' --exclude='*.properties' $remote:$tomhome/$SRC/$webappdir/ $tomhome/$temname/$webappdir/
+    stoptem
+    starttem
+}
+
+case $1 in
+    auth) SRC=auth && temname=tem-auth-1 && webappdir=webapps/tem-auth-rest ;;
+    frontend) SRC=frontend && temname=tem-frontend-1 && webappdir=webapps/tem-rest-frontend ;;
+    setting) SRC=tem-setting-1 && temname=tem-setting-1 && webappdir=webapps/tem-rest-officeSupport ;;
+    resource) SRC=resourceManger && temname=tem-resource-1 && webappdir=webapps/tem-rest-resourceManager ;;
+    support) SRC==support.iclassedu.com-1&& temname=support.iclassedu.com-1 && webappdir=webapps/Service_platform ;;
+    order) SRC=support && temname=tem-order-1 && webappdir=webapps/tem-rest-support ;;
+    witkey) SRC=tem-witkey-1 && temname=tem-witkey-1 && webappdir=webapps/tem-rest-crowdsourcing ;;
+    track ) SRC=flow_tracking && temname=track.iclassedu.com && webappdir=webapps/flow_tracking ;;	
+    * )  usage 2>&1;;
+esac
+
+if [ -z $2 ];then
+    echo -e "Please enter command rsync|restart|start|stop"
+    elif [ "$2" = "restart" ];then
+        stoptem
+        starttem
+    elif [ "$2" = "stop" ];then
+        stoptem
+    elif [ "$2" = "start" ];then
+        starttem
+    elif [ "$2" = "rsync" ];then
+        Rsync
+    elif [ "$2" = "log" ];then
+        log
+fi
