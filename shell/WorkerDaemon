@@ -1,0 +1,162 @@
+#!/bin/bash
+source /etc/profile 2>&1 > /dev/null
+
+trap 'if [[ -f ${DEMON_PID_FILE} ]]; then rm -rf ${DEMON_PID_FILE}; fi ; exit 1' 1 2 3 9 15
+
+Usage(){
+    echo """
+    Usage:
+        ${0} student|class|statistic start|stop|status
+
+        congfig:
+            plz edit conf/worker.conf before use ${0} .
+
+        use like this:
+            ${0} statistic start #<= this will be start statistic worker .
+            ${0} statistic stop  #<= this will be stop statistic worker .
+    """
+}
+
+MailNotic(){
+    if [[ ! -f "/bin/mailx" ]];then
+        return 0
+    fi
+
+    if [[ -f "${WORKER_LOG_DIR}/${WORKER_LOG_FILE}" ]];then
+        LOG_MSSG=$(tail -n 30 ${WORKER_LOG_DIR}/${WORKER_LOG_FILE})
+    else
+        LOG_MSSG="not found log <${WORKER_LOG_DIR}/${WORKER_LOG_FILE}>"
+    fi
+
+    if [[ -f "${WORKER_LOG_DIR}/${WORKER_OUT_FILE}" ]];then
+        OUT_MSSG=$(tail -n 30 ${WORKER_LOG_DIR}/${WORKER_OUT_FILE})
+    else
+        OUT_MSSG="not found out <${WORKER_LOG_DIR}/${WORKER_OUT_FILE}>"
+    fi
+
+    maillist="chengongliang@tsinghuabigdata.com ${MAIL_NOTICE}"
+    echo -e "\n\
+    HOST: [$(hostname)] - Worker: [${1}] is down .\n\
+    now start ${1} , at : <$(date "+[%Y-%m-%d] %H:%M:%S")> \n\n\n\
+    ************Log info****************\n\
+    ${LOG_MSSG} \n\n\n\
+    ************Out info****************\n\
+    ${OUT_MSSG} \n\n\n\
+
+    sendmail by auto deploy tools , plz don't reply ." | mailx -s "Worker: ${1} down " ${maillist}
+}
+
+# load system func
+if [[ -f "/lib/lsb/init-functions" ]]; then
+    . /lib/lsb/init-functions
+else
+    log_success_msg(){ 
+        echo -e "\033[32m--> SUCCESS!\033[0m $@" 
+    }
+    log_failure_msg(){ 
+        echo -e "\033[31m--> ERROR!\033[0m $@"
+        #exit 1
+    }
+fi
+
+###
+# load conf
+###
+ 
+DAEMON_HOME=$(cd $(dirname ${0})>/dev/null;pwd)
+WORKER_HOME=${DAEMON_HOME%/*}
+
+Main(){
+
+    if [[ ! -f "${DAEMON_HOME}/worker.conf" ]]; then
+        log_failure_msg "Couldn't find conf <${WORKER_HOME}/worker.conf>"
+        exit 1
+    else
+        # load ${WORKER_NAME} ${CLASS} ${JVM_OPTS} ${JAVA_OPTS}
+        . ${DAEMON_HOME}/worker.conf
+    fi
+
+    if [[ "${JVM_OPTS}" == "" ]]; then
+        log_failure_msg "<worker.conf> JVM_OPTS is null ."
+        exit 1
+    else
+        JAVA_OPTS="${JVM_OPTS} -Dworker.log.dir=${WORKER_LOG_DIR} -Dworker.log.file=${WORKER_LOG_FILE}"
+    fi
+
+    if [[ "${JAVA_OPTS}" == "" ]]; then
+        log_failure_msg "<worker.conf> JAVA_OPTS is null ."
+        exit 1
+    fi
+
+    if [[ "${CLASS}" == "" ]] ; then
+        log_failure_msg "<worker.conf> CLASS is null ."
+        exit 1
+    fi
+
+    WORKER_LOG_DIR="${WORKER_HOME}/logs"
+    WORKER_LOG_FILE="${WORKER_NAME}-worker.log"
+    WORKER_OUT_FILE="${WORKER_NAME}-worker.out"
+    WORKER_PID_FILE="${WORKER_LOG_DIR}/${WORKER_NAME}.pid"
+    #hecran
+    ServiceStartupTimeout="20"
+    DEMON_PID_FILE="${WORKER_LOG_DIR}/daemon.PID"
+    DEMON_PID="$$"
+
+    if [[ -f "${DEMON_PID_FILE}" ]]; then
+        rm -rf "${DEMON_PID_FILE}"
+    fi
+
+    if [[ ! -d "${WORKER_LOG_DIR}" ]]; then
+        mkdir -p "${WORKER_LOG_DIR}"
+    fi
+
+    CLASSPATH=${WORKER_HOME}/conf
+    CLASSPATH=${CLASSPATH}:${WORKER_HOME}
+
+    for f in ${WORKER_HOME}/*.jar; do
+        CLASSPATH=${CLASSPATH}:$f
+    done
+
+    for f in ${WORKER_HOME}/lib/*.jar; do
+        CLASSPATH=${CLASSPATH}:$f
+    done
+
+}
+
+Worker_Start_CMD(){
+    nohup java -Dproc_${WORKER_NAME} -cp $CLASSPATH  -XX:OnOutOfMemoryError="kill -9 %p" $JAVA_OPTS $CLASS ${WORKER_NAME} ${PROPERTIES} > $WORKER_LOG_DIR/$WORKER_OUT_FILE  2>&1 &
+}
+
+Start_Daemon(){
+
+    Main
+    local TARGET_ID="99999999999"
+    echo ${DEMON_PID} > ${DEMON_PID_FILE}
+
+    while true ; do
+        sleep 1
+        if [[ -f ${WORKER_PID_FILE} ]]; then
+            local TARGET_ID="$(cat ${WORKER_PID_FILE})"
+        else
+            log_failure_msg "Worker Pid file no found <${WORKER_PID_FILE}>"
+            exit 1
+        fi
+        
+        if [[ $(ps -p "${TARGET_ID}" -o args=) =~ ${WORKER_NAME} ]]; then
+            :
+        else
+            sleep 60s
+            MailNotic "${WORKER_NAME}"
+            Worker_Start_CMD
+            NewJavaPid=$!
+            if [[ $(ps -p "${NewJavaPid}" -o args=) =~ ${WORKER_NAME} ]]; then
+                echo ${NewJavaPid} > ${WORKER_PID_FILE}
+            fi
+        fi
+    done
+}
+
+case ${1} in
+    DaemonStart ) Start_Daemon ;;
+    * )  Usage ;;
+esac
