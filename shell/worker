@@ -1,7 +1,8 @@
+#!/bin/bash
 source /etc/profile 2>&1>/dev/null
 set -e
 #read -p "please input remoteserver:" remoteserver
-remoteserver=172.16.8.5
+remoteserver=172.16.8.7
 usage(){
     echo -e """    include : bee/frontend/workallocation/dataauto/sendserver/vanning/taskmanager
     command : rsync/start/restart/stop/status/log
@@ -52,25 +53,14 @@ case $1 in
     sendserver) workername=tem-support-sendServer ;;
     vanning) workername=tem-hyw-vanning ;;
     taskmanager) workername=tem-hyw-taskManager ;;
-    *) usage ;;
+    *) usage && exit;;
 esac
 
-if [ -z $1 ];then
-    exit
-fi
-
-if [ -z $2 ];then
-    echo -e "\033[35mPlease enter command rsync|restart|start|stop|status|log\033[0m"
-    elif [ "$2" = "restart" ];then
-        restartworker
-    elif [ "$2" = "stop" ];then
-        stopworker
-    elif [ "$2" = "start" ];then
-        startworker
-    elif [ "$2" = "status" ];then
-        status
-    elif [ "$2" = "rsync" ];then
-        rsync
-    elif [ "$2" = "log" ];then
-        log
-fi
+case $2 in
+    restart) restartworker;;
+    stop) stopworker;;
+    status) status;;
+    rsync) rsync;;
+    log) log;;
+    *) echo -e "\033[35mPlease enter command rsync|restart|start|stop|status|log\033[0m";;
+esac
