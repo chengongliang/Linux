@@ -40,6 +40,8 @@ log(){
 }
 
 Rsync(){
+    echo -e "\033[35mThis will rsync ${temname} from $remote\033[0m"
+    read -p "Please press any key to continue" var
     /usr/bin/rsync -apv --delete --exclude=spring --exclude='*.xml' --exclude='*.properties' $remote:$tomhome/$SRC/$webappdir/ $tomhome/$temname/$webappdir/
     stoptem
     starttem
