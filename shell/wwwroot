@@ -16,6 +16,8 @@ usage(){
 }
 
 rsync(){
+        echo -e "\033[35mThis will rsync ${DST}.iclassedu.com from $remote\033[0m"
+        read -p "Please press any key to continue" var
         /usr/bin/rsync -apv  $remote:$wwwdir/$SRC.iclassedu.com/ $wwwdir/$DST.iclassedu.com/
 }
 
