@@ -57,17 +57,15 @@ case $1 in
     * )  usage 2>&1;;
 esac
 
-if [ -z $2 ];then
-    echo -e "\033[35mPlease enter command rsync|restart|start|stop|log\033[0m"
-    elif [ "$2" = "restart" ];then
-        stoptem
-        starttem
-    elif [ "$2" = "stop" ];then
-        stoptem
-    elif [ "$2" = "start" ];then
-        starttem
-    elif [ "$2" = "rsync" ];then
-        Rsync
-    elif [ "$2" = "log" ];then
-        log
+if [ -z $1 ];then
+    exit
 fi
+
+case $2 in
+    restart)stoptem && starttem;;
+    start)starttem;;
+    stop)stoptem;;
+    rsync)Rsync;;
+    log)log;;
+    *)echo -e "\033[35mPlease enter command : rsync|restart|start|stop|log\033[0m";;
+esac
