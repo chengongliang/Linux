@@ -2,18 +2,20 @@
 source /etc/profile 2>&1>/dev/null
 set -e
 #read -p "please input remoteserver:" remoteserver
-remoteserver=172.16.8.7
+remote=172.16.8.7
 usage(){
     echo -e """    include : bee/frontend/workallocation/dataauto/sendserver/vanning/taskmanager
     command : rsync/start/restart/stop/status/log
-    \033[32m${0} bee rsync\033[0m <= this will rsync tem-bee-worker from $remoteserver =>
+    \033[32m${0} bee rsync\033[0m <= this will rsync tem-bee-worker from $remote =>
     \033[32m${0} bee stop\033[0m  <= this will stop tem-frontend-worker =>
     \033[32m${0} bee log\033[0m   <= this will tailf *.out =>
     """
 }
 
-rsync(){   
-    /usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remoteserver:/home/worker/$workername /home/
+rsync(){
+    echo -e "\033[35mThis will rsync $workername from $remote\033[0m"
+    read -p "Please press any key to continue" var
+    /usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remote:/home/worker/$workername /home/
     restartworker
 }
 
