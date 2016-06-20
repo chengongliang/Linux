@@ -64,5 +64,5 @@ case $2 in
     status) status;;
     rsync) rsync;;
     log) log;;
-    *) echo -e "\033[36mUsage $0 rsync|restart|start|stop|status|log\033[0m";;
+    *) echo -e "\033[36mUsage: $0 rsync|restart|start|stop|status|log\033[0m";;
 esac
