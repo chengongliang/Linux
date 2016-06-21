@@ -8,13 +8,13 @@ usage(){
     command : rsync/start/restart/stop/status/log
     \033[32m${0} bee rsync\033[0m <= this will sync tem-bee-worker from $remote =>
     \033[32m${0} bee stop\033[0m  <= this will stop tem-frontend-worker =>
-    \033[32m${0} bee log\033[0m   <= this will tailf *.out =>
+    \033[32m${0} bee log\033[0m   <= input a command to open logfile =>
     """
 }
 
 rsync(){
-    echo -e "\033[35mThis will rsync $workername from $remote\033[0m"
-    read -p "Please press any key to continue" var
+    echo -e "\033[35mThis will sync $workername from $remote \nPlease press any key to continue\033[0m"
+    read -a var
     /usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remote:/home/worker/$workername /home/
     restartworker
 }
@@ -42,6 +42,8 @@ restartworker(){
 }
 
 log(){
+    echo -ne "\033[32mWhich command do you want to open the logfile: \033[0m"
+    read -a command
     tailf /home/$workername/logs/*.out
 }
 
