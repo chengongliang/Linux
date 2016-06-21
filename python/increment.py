@@ -6,10 +6,11 @@ from datetime import date
 import sys
 import os
 
+# 取hbase 所有表名
 output=os.popen("echo 'list' | /home/hadoop/hbase/bin/hbase shell | grep '\[.*\]'").read()
 tables=output[1:len(output)-2].replace('"','').replace(' ','').split(',')
 
-# tables need to filter
+# 需过滤的表
 filters=["tsinghua_edu_history_exsite","tsinghua_edu_history_word","tsinghua_edu_standart_exsite","tsinghua_edu_standart_word","resource_manager_indexing","tsinghua_edu_context_index"]
 tables=[i for i in tables if i not in filters]
 
@@ -19,6 +20,7 @@ today=date.today()
 
 RemoteServer69  = os.system("ssh -p 55556 root@182.150.21.99 pwd")
 
+# 最近一次同步的日期
 f = open('/root/lastImportDate','r')
 lastImportDate = datetime.datetime.strptime(f.readline().strip(), "%Y-%m-%d %H:%M:%S,%f")
 f.close()
@@ -43,17 +45,19 @@ if RemoteServer69 == 0:
     files.write("\n")
     file.write(tablename)
     file.write("\n")
+    # 每月16号全量同步
     if today.day == 16:
       backupSubFolder=backupDst + "/full/" + yesterday.isoformat() + "/" + tablename
       cmd="/sbin/runuser -l hadoop -c '/home/hadoop/hbase/bin/hbase org.apache.hadoop.hbase.mapreduce.Export %s %s'"%(tablename, backupSubFolder)
       os.system(cmd)
-
+    # 增量同步
     backupSubFolder=backupDst+"/increment/"+yesterday.isoformat()+"/"+tablename
     cmd="/sbin/runuser -l hadoop -c '/home/hadoop/hbase/bin/hbase org.apache.hadoop.hbase.mapreduce.Export %s %s 1 %s'"%(tablename,backupSubFolder,str(int(lastImportDateStamp)*1000))
     os.system(cmd)
 
   file.close()
   files.close()
+  # 导出的数据拷贝到本地
   copyCmd="/sbin/runuser -l hadoop -c '/home/hadoop/hadoop/bin/hdfs dfs -copyToLocal " + backupDst + "/increment/" + yesterday.isoformat() + " /home/hadoop/increment_dump/'"
   os.system(copyCmd)
   os.system("mv /home/hadoop/increment_dump/" + yesterday.isoformat() + " /root/increment/")
@@ -64,14 +68,12 @@ else:
   os.system("echo \"RemoteServer [172.16.6.10] is down\" | /bin/mailx -s \"Hbase_dump OnLine ERROR\" biqin@tsinghuabigdata.com ")
   exit()
 
-
 ScpStatus = 1
 count = 0
 while (ScpStatus != 0 & count < 5):
   os.system("ssh -p 55556 root@182.150.21.99 \"mkdir -p /data/hecran/hbase/increment/\"")
   ScpStatus = os.system("scp -P 55556 " + tarFile + " root@182.150.21.99:/data/hecran/hbase/increment/")
   count = count + 1
-
 
 if(count != 5):
   os.system("rm -rf /root/increment/*")
