@@ -11,7 +11,7 @@ usage(){
     ${0} ${auth/frontend/setting/witkey/track/resource/service/support}
     include : auth/frontend/setting/witkey/track/resource/service/support
     input like:
-    \033[32m${0} auth rsync <= this will rsync tem-auth from $remote=>\033[0m
+    \033[32m${0} auth rsync <= this will sync tem-auth from $remote=>\033[0m
     \033[32m${0} auth stop  <= this will stop tem-auth =>\033[0m
     \033[32m${0} auth log   <= this will tailf catalina.out =>\033[0m
     """
