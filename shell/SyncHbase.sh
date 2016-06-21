@@ -5,7 +5,7 @@ CY_HADOOP_USER="root"
 CY_HADOOP_HOME="/home/hadoop/hadoop"
 CY_HBASES_HOME="/home/hadoop/hbase"
 
-############advanced conf############
+###########advanced conf###########
 RemoteServer="172.16.6.10"
 # SSHPORT="22"
 # USERNAME="root"
