@@ -1,5 +1,5 @@
 #!/bin/bash
-source /etc/profile
+source /etc/profile 2>&>1>/dev/null
 
 remote=172.16.8.5
 wwwdir=/home/wwwroot
@@ -8,25 +8,29 @@ wwwdir=/home/wwwroot
 
 usage(){
         echo """
-        ${0} ${jump/order/resource/setting/upgrade/video/witkey/www/wx}
+        ${0} ${order/resource/setting/tracking/upgrade/video/witkey/witkeymanager/www}
         input like:
-        ${0} upgrade #<= this will sync upgrade.iclassedu.com =># 
+        ${0} witkey #<= this will sync witkey.iclassedu.com =># 
         ${0} www #<= this will rsync www.iclassedu.com =>#   
         """
 }
 
-rsync(){
+Rsync(){
         echo -e "\033[35mThis will rsync ${DST}.iclassedu.com from $remote\033[0m"
         read -p "Please press any key to continue" var
-        /usr/bin/rsync -apv  $remote:$wwwdir/$SRC.iclassedu.com/ $wwwdir/$DST.iclassedu.com/
+        rsync -apv --delete $remote:$wwwdir/$SRC.iclassedu.com/ $wwwdir/$DST.iclassedu.com/
 }
 
 case ${1} in
-        resource ) SRC=$iresource && DST=${1} && rsync;;
-        www ) SRC=${1} && DST=${1} && rsync;;
-        support ) SRC=${1} && DST=${1} && rsync;;
-        upgrade ) SRC=${1} && DST=${1} && rsync;;
-        video ) SRC=${1} && DST=${1} && rsync;;
-        wx ) SRC=${1} && DST=${1} && rsync;;
+        resource ) SRC=iresource && DST=${1} && Rsync;;
+        www ) SRC=${1} && DST=${1} && Rsync;;
+        order) SRC=support && DST=${1} && Rsync;;
+        upgrade ) SRC=${1} && DST=${1} && Rsync;;
+        video ) SRC=${1} && DST=${1} && Rsync;;
+        setting ) SRC=${1} && DST=${1} && Rsync;;
+        witkey ) SRC=${1} && DST=${1} && Rsync;;
+        witkeymanager ) SRC=${1} && DST=${1} && Rsync;;
+        tracking ) SRC=${1} && DST=${1} && Rsync;;
+        wx ) SRC=${1} && DST=${1} && Rsync;;
         * )  usage 2>&1;;
 esac
