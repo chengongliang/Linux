@@ -10,7 +10,7 @@ usage(){
         echo """
         ${0} ${jump/order/resource/setting/upgrade/video/witkey/www/wx}
         input like:
-        ${0} upgrade #<= this will rsync upgrade.iclassedu.com =># 
+        ${0} upgrade #<= this will sync upgrade.iclassedu.com =># 
         ${0} www #<= this will rsync www.iclassedu.com =>#   
         """
 }
