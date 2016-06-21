@@ -42,7 +42,7 @@ restartworker(){
 }
 
 log(){
-    echo -ne "\033[32mWhich command do you want to open the logfile: \033[0m"
+    echo -ne "\033[32mUse which command to open the logfile: \033[0m"
     read -a command
     tailf /home/$workername/logs/*.out
 }
