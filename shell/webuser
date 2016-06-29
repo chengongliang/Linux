@@ -1,17 +1,25 @@
 #!/bin/bash
-source /etc/profile
+source /etc/profile 2>&1 > /dev/null
 set -e
 remote=172.16.8.7
 tomhome=/home/webuser
 
 #read -p "please input remoteserver:" remote
-
+init(){
+    if [ -d $backdir ];then
+        return 0
+    else
+        mkdir -p $backdir/release
+        touch $backdir/last_version
+        echo 0 > $backdir/last_version
+    fi
+}
 usage(){
     echo -e """
     ${0} ${auth/frontend/setting/witkey/track/resource/service/support}
     include : auth/frontend/setting/witkey/track/resource/service/support
-    input like:
-    \033[32m${0} auth rsync <= this will sync tem-auth from $remote=>\033[0m
+    command : rsync/start/stop/restart/log
+    \033[32m${0} auth rsync <= this will rsync tem-auth from $remote =>\033[0m
     \033[32m${0} auth stop  <= this will stop tem-auth =>\033[0m
     \033[32m${0} auth log   <= this will tailf catalina.out =>\033[0m
     """
@@ -20,7 +28,7 @@ usage(){
 stoptem(){
     PID=$(jps -v|grep -v grep|grep $temname|awk '{print $1}')
     (test ! -z "$PID" &&
-    echo -e "\033[35m stop $temname pid:$PID \033[0m" &&
+    echo -e "\033[35m stop  $temname pid:$PID \033[0m" &&
     kill -9 $PID
     )|| echo -e "\033[33m $temname not running \033[0m"
 }
@@ -34,7 +42,28 @@ starttem(){
         echo -e "\033[35m $temname has already started !\033[0m"
     fi
 }
+backup(){
+    version=`cat $backdir/last_version`
+    newversion=$(($version+1))
+    mkdir $backdir/release/$newversion
+    /usr/bin/rsync -ap  $tomhome/$temname/$webappdir/ $backdir/release/$newversion
+    ln -fsT $backdir/release/$newversion/ $backdir/last
+    echo $newversion > $backdir/last_version
+    cd $backdir/release/ || exit 15
+    count=`ls -1d [0-9]* | sort -rn | wc -l`
+    remove=$(($count > 3 ? $count - 3 : 0))
+    ls -1d [0-9]* | sort -rn | tail -n $remove | xargs rm -rf {}
+}
 
+rollback(){
+    lastdate=`ls -l $backdir/last|awk '{print $6$7}'`
+    echo -e "\033[32mThis will rollback to $lastdate's version\nPress any key to continue\033[0m"
+    read -a roll
+    /usr/bin/rsync -avp $backdir/last/ $tomhome/$temname/$webappdir/
+}
+Status(){
+    ps -ef |grep -v grep|grep --color=auto $temname
+}
 log(){
     echo -ne "\033[32mUse which command to open the logfile: \033[0m"
     read -a command
@@ -42,7 +71,12 @@ log(){
 }
 
 Rsync(){
-    echo -e "\033[35mThis will sync $temnamename from $remote \nPlease press any key to continue\033[0m"
+    if [ -z $temname ];then
+        exit
+    fi
+    init
+    backup
+    echo -e "\033[35mThis will sync $temname from $remote \nPlease press any key to continue\033[0m"
     read -a var
     /usr/bin/rsync -apv --delete --exclude=spring --exclude='*.xml' --exclude='*.properties' $remote:$tomhome/$SRC/$webappdir/ $tomhome/$temname/$webappdir/
     stoptem
@@ -60,16 +94,17 @@ case $1 in
     track ) SRC=flow_tracking && temname=track.iclassedu.com && webappdir=webapps/flow_tracking ;;	
     * )  usage 2>&1;;
 esac
-
 if [ -z $1 ];then
     exit
 fi
-
+backdir=/home/ifgsll/webuser/$temname
 case $2 in
     restart)stoptem && starttem;;
     start)starttem;;
     stop)stoptem;;
     rsync)Rsync;;
+    status)Status;;
+    rollback)rollback && stoptem && starttem;;
     log)log;;
-    *)echo -e "\033[35mPlease enter command : rsync|restart|start|stop|log\033[0m";;
+    *)echo -e "\033[35mPlease enter command : rsync|restart|start|stop|log|rollback\033[0m";;
 esac
