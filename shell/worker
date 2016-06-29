@@ -1,18 +1,33 @@
 #!/bin/bash
-source /etc/profile 2>&1>/dev/null
+source /etc/profile >/dev/null
 set -e
 #read -p "please input remoteserver:" remoteserver
 remote=172.16.8.7
 usage(){
-    echo -e """    include : bee/frontend/workallocation/dataauto/sendserver/vanning/taskmanager
+    echo -e """    include : bee/hbee/frontend/workallocation/dataauto/demoauto/sendserver/vanning/taskmanager
     command : rsync/start/restart/stop/status/log
-    \033[32m${0} bee rsync\033[0m <= this will sync tem-bee-worker from $remote =>
+    \033[32m${0} bee rsync\033[0m <= this will rsync tem-bee-worker from $remote= >
     \033[32m${0} bee stop\033[0m  <= this will stop tem-frontend-worker =>
-    \033[32m${0} bee log\033[0m   <= input a command to open logfile =>
+    \033[32m${0} bee log\033[0m   <= input a command to open *.out =>
     """
 }
 
+init(){
+    if [ -d $backdir ];then
+        return 0
+    else
+        mkdir -p $backdir/release
+        touch $backdir/last_version
+        echo 0 > $backdir/last_version
+    fi
+}
+
 rsync(){
+    if [ -z $workername ];then
+        exit
+    fi
+    init
+    backup
     echo -e "\033[35mThis will sync $workername from $remote \nPlease press any key to continue\033[0m"
     read -a var
     /usr/bin/rsync -avp --delete --exclude='logs/*' --exclude=recovery-data --exclude=conf --exclude='*.pid' --exclude='*.log*' --exclude='*.out' $remote:/home/worker/$workername /home/
@@ -47,6 +62,23 @@ log(){
     $command /home/$workername/logs/*.out
 }
 
+backup(){
+    version=`cat $backdir/last_version`
+    newversion=$(($version+1))
+    mkdir $backdir/release/$newversion
+    /usr/bin/rsync -ap --exclude='logs' --exclude='*.pid'  /home/$workername/ $backdir/release/$newversion
+    ln -fsT $backdir/release/$newversion/ $backdir/last
+    echo $newversion > $backdir/last_version
+}
+
+rollback(){
+    lastdate=`ls -l $backdir/last|awk '{print $6$7}'`
+    echo -e "\033[32mThis will rollback to $lastdate's version\nPress any key to continue\033[0m"
+    read -a roll
+    /usr/bin/rsync -avp --exclude='logs' --exclude='*.pid' $backdir/last/ /home/$workername/
+    restartworker
+}
+
 case $1 in
     bee) workername=tem-bee-worker ;;
     hbee) workername=tem-hbee-worker ;;
@@ -59,12 +91,14 @@ case $1 in
     taskmanager) workername=tem-hyw-taskManager ;;
     *) usage && exit;;
 esac
-
+backdir=/home/ifgsll/worker/$workername
 case $2 in
     restart) restartworker;;
+    start) startworker;;
     stop) stopworker;;
     status) status;;
     rsync) rsync;;
     log) log;;
-    *) echo -e "\033[36mUsage: $0 rsync|restart|start|stop|status|log\033[0m";;
+    rollback) rollback;;
+    *) echo -e "\033[36mUsage: $0 rsync|restart|start|stop|status|log|rollback\033[0m";;
 esac
