@@ -92,11 +92,8 @@ case $1 in
     order) SRC=support && temname=tem-order-1 && webappdir=webapps/tem-rest-support ;;
     witkey) SRC=tem-witkey-1 && temname=tem-witkey-1 && webappdir=webapps/tem-rest-crowdsourcing ;;
     track ) SRC=flow_tracking && temname=track.iclassedu.com && webappdir=webapps/flow_tracking ;;	
-    * )  usage 2>&1;;
+    * )  usage && exit;;
 esac
-if [ -z $1 ];then
-    exit
-fi
 backdir=/home/ifgsll/webuser/$temname
 case $2 in
     restart)stoptem && starttem;;
