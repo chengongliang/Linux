@@ -1,36 +1,72 @@
 #!/bin/bash
-source /etc/profile 2>&>1>/dev/null
 
-remote=172.16.8.5
+source /etc/profile 2>&1>/dev/null
+remote=172.16.8.7
 wwwdir=/home/wwwroot
-
+backdir=/home/ifgsll/wwwroot/$1.iclassedu.com
 #read -p "please input remoteserver:" remote
 
 usage(){
-        echo """
-        ${0} ${order/resource/setting/tracking/upgrade/video/witkey/witkeymanager/www}
-        input like:
-        ${0} witkey #<= this will sync witkey.iclassedu.com =># 
-        ${0} www #<= this will rsync www.iclassedu.com =>#   
-        """
+    echo -e """    include :order/resource/setting/tracking/upgrade/video/witkey/witkeymanager/www
+    command :rsync/rollback
+    input like:
+    \033[32m${0} www rsync     <= this will sync www.iclassedu.com from $remote =>\033[0m
+    \033[32m${0} www rollback  <= this will rollback www.iclassedu.com lastversion =>\033[0m
+    """
+}
+
+init(){
+    if [ -d $backdir ];then
+        return 0
+    else
+        mkdir -p $backdir/release
+        touch $backdir/last_version
+        echo 0 > $backdir/last_version
+    fi
+}
+
+backup(){
+    version=`cat $backdir/last_version`
+    newversion=$(($version+1))
+    mkdir $backdir/release/$newversion
+    /usr/bin/rsync -ap  /home/wwwroot/$DST.iclassedu.com/ $backdir/release/$newversion
+    ln -fsT $backdir/release/$newversion/ $backdir/last
+    echo $newversion > $backdir/last_version
+    cd $backdir/release/ || exit 15
+    count=`ls -1d [0-9]* | sort -rn | wc -l`
+    remove=$(($count > 3 ? $count - 3 : 0))
+    ls -1d [0-9]* | sort -rn | tail -n $remove | xargs rm -rf {}
+}
+
+rollback(){
+    lastdate=`ls -l $backdir/last|awk '{print $6$7}'`
+    echo -e "\033[32mThis will rollback to $lastdate's version\nPress any key to continue\033[0m"
+    read -a roll
+    /usr/bin/rsync -avp --delete  $backdir/last/ /home/wwwroot/$DST.iclassedu.com/
 }
 
 Rsync(){
-        echo -e "\033[35mThis will rsync ${DST}.iclassedu.com from $remote\033[0m"
-        read -p "Please press any key to continue" var
-        rsync -apv --delete $remote:$wwwdir/$SRC.iclassedu.com/ $wwwdir/$DST.iclassedu.com/
+    init
+    backup
+    echo -e "\033[35mThis will rsync ${DST}.iclassedu.com from $remote\033[0m"
+    read -p "Please press any key to continue" var
+    rsync -apv --delete  $remote:$wwwdir/$SRC.iclassedu.com/ $wwwdir/$DST.iclassedu.com/
 }
 
 case ${1} in
-        resource ) SRC=iresource && DST=${1} && Rsync;;
-        www ) SRC=${1} && DST=${1} && Rsync;;
-        order) SRC=support && DST=${1} && Rsync;;
-        upgrade ) SRC=${1} && DST=${1} && Rsync;;
-        video ) SRC=${1} && DST=${1} && Rsync;;
-        setting ) SRC=${1} && DST=${1} && Rsync;;
-        witkey ) SRC=${1} && DST=${1} && Rsync;;
-        witkeymanager ) SRC=${1} && DST=${1} && Rsync;;
-        tracking ) SRC=${1} && DST=${1} && Rsync;;
-        wx ) SRC=${1} && DST=${1} && Rsync;;
-        * )  usage 2>&1;;
+    resource ) SRC=iresource && DST=${1};;
+    www ) SRC=${1} && DST=${1};;
+    order) SRC=support && DST=${1};;
+    upgrade ) SRC=${1} && DST=${1};;
+    video ) SRC=${1} && DST=${1};;
+    setting ) SRC=${1} && DST=${1};;
+    witkey ) SRC=${1} && DST=${1};;
+    witkeymanager ) SRC=${1} && DST=${1};;
+    tracking ) SRC=${1} && DST=${1};;
+    * )  usage && exit;;
+esac
+case $2 in
+    rsync )Rsync;;
+    rollback )rollback;;
+    * ) usage;;
 esac
