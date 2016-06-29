@@ -1,0 +1,39 @@
+#!/bin/bash
+source /etc/profile >/dev/null
+
+usage(){
+    echo -e "\033[32madd email\ndel email\033[0m"
+}
+
+mail(){
+    echo "Your SVN account passwd has been changed
+ 
+
+change time:
+`date`
+
+Your passwd:
+$passwd" |mailx -s "Your SVN account passwd has been changed" $user
+}
+
+add(){
+    passwd=`tr -dc A-Za-z0-9 < /dev/urandom|head -c 10|xargs`
+    htpasswd -b /data/account/dav_svn.passwd $user $passwd
+}
+del(){
+    sed -i '/^'$user'/d' /data/account/dav_svn.passwd
+}
+Reload(){
+    apachectl graceful
+}
+if [ -z $2 ];then
+    usage
+    exit
+else
+    user=$2
+fi
+case $1 in
+    add) add && Reload && mail;;
+    del) del && Reload;;
+    *) usage;;
+esac
