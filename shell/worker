@@ -79,7 +79,7 @@ rollback(){
     lastdate=`ls -l $backdir/last|awk '{print $6$7}'`
     echo -e "\033[32mThis will rollback to $lastdate's version\nPress any key to continue\033[0m"
     read -a roll
-    /usr/bin/rsync -avp --exclude='logs' --exclude='*.pid' $backdir/last/ /home/$workername/
+    /usr/bin/rsync -avp --delete --exclude='logs' --exclude='*.pid' $backdir/last/ /home/$workername/
     restartworker
 }
 
