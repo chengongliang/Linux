@@ -69,6 +69,10 @@ backup(){
     /usr/bin/rsync -ap --exclude='logs' --exclude='*.pid'  /home/$workername/ $backdir/release/$newversion
     ln -fsT $backdir/release/$newversion/ $backdir/last
     echo $newversion > $backdir/last_version
+    cd $backdir/release/ || exit 15
+    count=`ls -1d [0-9]* | sort -rn | wc -l`
+    remove=$(($count > 5 ? $count - 5 : 0))
+    ls -1d [0-9]* | sort -rn | tail -n $remove | xargs rm -rf {}
 }
 
 rollback(){
