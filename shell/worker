@@ -5,7 +5,7 @@ set -e
 remote=172.16.8.7
 usage(){
     echo -e """    include : bee/hbee/frontend/workallocation/dataauto/demoauto/sendserver/vanning/taskmanager
-    command : rsync/start/restart/stop/status/log
+    command : rsync/start/restart/stop/status/log/rollback
     \033[32m${0} bee rsync\033[0m <= this will rsync tem-bee-worker from $remote= >
     \033[32m${0} bee stop\033[0m  <= this will stop tem-frontend-worker =>
     \033[32m${0} bee log\033[0m   <= input a command to open *.out =>
