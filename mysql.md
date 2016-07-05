@@ -1,12 +1,12 @@
 MySQL官网下载地址 `http://dev.mysql.com/downloads/`
 
->先删除原有MySQL，再进行源码安装
-rpm -qa|grep mysql
-yum remove mysql-libs-5.1.73-5.el6_6.i686
+> 先删除原有MySQL，再进行源码安装
+`rpm -qa|grep mysql`
+`yum remove mysql-libs-5.1.73-5.el6_6.i686`
 
-#安装步骤：
+##安装步骤：
 
-##下载解压
+###下载解压
 ```
 cd /usr/local/src/
 wget http://mirrors.sohu.com/mysql/MySQL-5.1/mysql-5.1.73-linux-i686-glibc23.tar.gz 
@@ -14,16 +14,16 @@ tar zxvf /usr/local/src/mysql-5.1.73-linux-i686-icc-glibc23.tar.gz
 把解压完的数据移动到/usr/local/mysql
 mv mysql-5.1.73-linux-i686-icc-glibc23 /usr/local/mysql
 ```
-##建立mysql用户
+###建立mysql用户
 `[root@localhost src]# useradd -s /sbin/nologin -M mysql`
-##初始化数据库
+###初始化数据库
 ```
 [root@localhost src]# cd /usr/local/mysql
 [root@localhost mysql]# mkdir -p /data/mysql ; chown -R mysql:mysql /data/mysql
 [root@localhost mysql]# ./scripts/mysql_install_db --user=mysql --datadir=/data/mysql
   --user 定义数据库的所属主， --datadir 定义数据库安装到哪里，建议放到大空间的分区上，这个目录需要自行创建。关键步骤，看到两个 “OK” 说明执行正确
 ```
-##拷贝配置和启动脚本
+###拷贝配置和启动脚本
 ```
 [root@localhost mysql]# cp support-files/my-large.cnf /etc/my.cnf
 [root@localhost mysql]# cp support-files/mysql.server /etc/init.d/mysqld
