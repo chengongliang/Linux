@@ -17,11 +17,11 @@ while True:
         break
     else:
         if number == int(num_input):
-            print "OK,you are right.\nguess time is %s" % guess
+            print "OK,you are right.\nguess times %s" % guess
             break
         elif number > int(num_input):
-            print "your number is smaller.\nguess time is %s" % guess
+            print "your number is smaller.\nguess times %s" % guess
         elif number < int(num_input):
-            print "your number is biger.\nguess time is %s" % guess
+            print "your number is biger.\nguess times %s" % guess
         else:
             print "There is something bad, I will not work"
