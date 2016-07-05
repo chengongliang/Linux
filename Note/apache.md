@@ -22,9 +22,12 @@ apache官网下载地址：`http://www.apache.org/dyn/closer.cgi`
 * 如果这一步出现了这样的错误:
 *error: mod_deflate has been requested but can not be built due to prerequisite failures*
 
-解决办法
+解决办法:
+
 `yum install -y zlib-devel`
+
 为了避免在make的时候出现错误，最好提前先安装好一些库文件:
+
 `yum install -y pcre pcre-devel apr apr-devel`
 ##安装
 ```
