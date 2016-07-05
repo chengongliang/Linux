@@ -39,5 +39,5 @@ mv mysql-5.1.73-linux-i686-icc-glibc23 /usr/local/mysql
 * 如果启动不了，到 /data/mysql/ 下查看错误日志，这个日志通常是主机名.err. 检查mysql是否启动的命令为:
 `[root@localhost mysql]# ps aux |grep mysqld`
 
-##设置初始密码 
+###设置初始密码 
 `mysqladmin -uroot password '920402'`
