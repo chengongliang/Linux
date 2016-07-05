@@ -23,7 +23,7 @@ mail(){
 
 add(){
     user=${1}
-    passwd=`tr -dc A-Za-z0-9 < /dev/urandom|head -c 10|xargs`
+    passwd=`tr -dc A-Za-z0-9 < /dev/urandom|head -c 10`
     htpasswd -b ${passwdFile} ${user} ${passwd}
     mail
 }
