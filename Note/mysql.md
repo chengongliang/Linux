@@ -1,8 +1,8 @@
 MySQL官网下载地址 `http://dev.mysql.com/downloads/`
 
 > 先删除原有MySQL，再进行源码安装
-`rpm -qa|grep mysql`
-`yum remove mysql-libs-5.1.73-5.el6_6.i686`
+rpm -qa|grep mysql
+yum remove mysql-libs-5.1.73-5.el6_6.i686
 
 ##安装步骤：
 
@@ -11,7 +11,6 @@ MySQL官网下载地址 `http://dev.mysql.com/downloads/`
 cd /usr/local/src/
 wget http://mirrors.sohu.com/mysql/MySQL-5.1/mysql-5.1.73-linux-i686-glibc23.tar.gz 
 tar zxvf /usr/local/src/mysql-5.1.73-linux-i686-icc-glibc23.tar.gz
-把解压完的数据移动到/usr/local/mysql
 mv mysql-5.1.73-linux-i686-icc-glibc23 /usr/local/mysql
 ```
 ###建立mysql用户
@@ -38,6 +37,6 @@ mv mysql-5.1.73-linux-i686-icc-glibc23 /usr/local/mysql
 [root@localhost mysql]# service mysqld start
 ```
 * 如果启动不了，到 /data/mysql/ 下查看错误日志，这个日志通常是主机名.err. 检查mysql是否启动的命令为:
-[root@localhost mysql]# ps aux |grep mysqld
+`[root@localhost mysql]# ps aux |grep mysqld`
 ##设置初始密码 
-mysqladmin -uroot password '920402'
+`mysqladmin -uroot password '920402'`
