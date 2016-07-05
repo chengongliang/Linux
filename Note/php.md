@@ -29,22 +29,22 @@
 --enable-exif \
 --disable-ipv6
 ```
-*常见错误
+> 常见错误
+
 1. configure: error: xml2-config not found. Please check your libxml2 installation
     yum install -y libxml2-devel
-2.configure: error: Cannot find OpenSSL's <evp.h> 
+2. configure: error: Cannot find OpenSSL's <evp.h> 
     yum install -y openssl openssl-devel
-3.checking for BZip2 in default path... not found
+3. checking for BZip2 in default path... not found
   configure: error: Please reinstall the BZip2 distribution 
     yum install -y bzip2 bzip2-devel
-4.configure: error: png.h not found.
+4. configure: error: png.h not found.
     yum install -y libpng libpng-devel
-5.configure: error: freetype.h not found
+5. configure: error: freetype.h not found
     yum install -y freetype freetype-devel
-6.configure: error: mcrypt.h not found. Please reinstall libmcrypt    因为centos6.x 默认的yum源没有libmcrypt-devel 这个包，只能借助第三方yum源。
-    rpm -ivh "http://www.lishiming.net/data/attachment/forum/month_1211/epel-release-6-7.noarch.rpm"  // CentOS6 32位epel源 
+6. configure: error: mcrypt.h not found. Please reinstall libmcrypt    因为centos6.x 默认的yum源没有libmcrypt-devel 这个包，只能借助第三方yum源。
     yum install -y  libmcrypt-devel
-7.configure: error: jpeglib.h not found
+7. configure: error: jpeglib.h not found
     yum install -y libjpeg-devel
 
 编译安装
