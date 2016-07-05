@@ -2,7 +2,6 @@
 source /etc/profile >/dev/null
 
 passwdFile=/data/account/dav_svn.passwd
-#passwdFile=/home/1.passwd
 
 usage(){
     echo -e "\033[32madd email\ndel email\033[0m"
