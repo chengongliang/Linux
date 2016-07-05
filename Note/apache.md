@@ -20,7 +20,6 @@ apache官网下载地址：`http://www.apache.org/dyn/closer.cgi`
 --enable-deflate=shared 表示共享的方式编译deflate，后面的参数同理。
 ```
 * 如果这一步出现了这样的错误:
-
 *error: mod_deflate has been requested but can not be built due to prerequisite failures*
 
 解决办法
