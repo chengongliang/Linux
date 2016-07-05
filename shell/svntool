@@ -1,39 +1,47 @@
 #!/bin/bash
 source /etc/profile >/dev/null
 
+passwdFile=/data/account/dav_svn.passwd
+#passwdFile=/home/1.passwd
+
 usage(){
     echo -e "\033[32madd email\ndel email\033[0m"
+    exit
 }
 
 mail(){
-    echo "Your SVN account passwd has been changed
+    echo -e "\n\
+    Your SVN account passwd has been changed .\n\n\n\
+    change time : \n\
+     $(date "+[%Y-%m-%d] %H:%M:%S") \n\n\
+    Your account: \n\
+     ${user} \n\n\
+    Your passwd: \n\
+     ${passwd} \n\n\
  
-
-change time:
-`date`
-
-Your passwd:
-$passwd" |mailx -s "Your SVN account passwd has been changed" $user
+    sendmail by autoalarm email , plz don't reply ." | mailx -s "Your SVN account passwd has been changed ." ${user}
 }
 
 add(){
+    user=${1}
     passwd=`tr -dc A-Za-z0-9 < /dev/urandom|head -c 10|xargs`
-    htpasswd -b /data/account/dav_svn.passwd $user $passwd
+    htpasswd -b ${passwdFile} ${user} ${passwd}
+    mail
 }
 del(){
-    sed -i '/^'$user'/d' /data/account/dav_svn.passwd
+    status=`grep ${1} ${passwdFile}`
+    if [ ${status} ];then
+        sed -i "/${1}/d" $passwdFile
+    else
+        echo "${1} not in ${passwdFile}"
+        exit
+    fi
 }
-Reload(){
-    apachectl graceful
-}
-if [ -z $2 ];then
-    usage
-    exit
-else
-    user=$2
-fi
-case $1 in
-    add) add && Reload && mail;;
-    del) del && Reload;;
+#Reload(){
+#    apachectl graceful
+#}
+case ${1} in
+    add) add ${2} ;;
+    del) del ${2} ;;
     *) usage;;
 esac
