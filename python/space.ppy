@@ -1,0 +1,8 @@
+#!/usr/bin/python
+#coding:utf-8
+string = raw_input("请输入字符，输出会去除多余空格: ")
+str_split = string.split(" ")
+words = [s for s in str_split if s!=""]
+
+new_string = " ".join(words)
+print new_string
