@@ -10,12 +10,8 @@ echo -e "$file\n" > webuser.tmp
 read -p "Please enter (y/yes) to confirm: " enter
 if [[ $enter = "y" || $enter = "yes" ]];then
     for f in $file;do
-        sed -i "/#metadata/{/#metadata/d}" $f
-        sed -i "/metadata/a\metadata.broker.list=mysql3:9092,worker1:9092" $f
-        sed -i "0,/metadata/{/metadata/d}" $f
-        sed -i "/#zookeeper/{/#zookeeper/d}" $f
-        sed -i "/zookeeper/a\zookeeper.connect=192.168.100.31:2181,192.168.100.32:2181,192.168.100.4:2181" $f
-        sed -i "0,/zookeeper/{/zookeeper/d}" $f
+        sed -i "/#metadata/{/#metadata/d}" $f && sed -i "/metadata/a\metadata.broker.list=mysql3:9092,worker1:9092" $f && sed -i "0,/metadata/{/metadata/d}" $f
+        sed -i "/#zookeeper/{/#zookeeper/d}" $f && sed -i "/zookeeper/a\zookeeper.connect=192.168.100.31:2181,192.168.100.32:2181,192.168.100.4:2181" $f && sed -i "0,/zookeeper/{/zookeeper/d}" $f
     done
     webuser=`awk -F'/' '{print $2}' webuser.tmp|uniq`
     for i in $webuser;do
