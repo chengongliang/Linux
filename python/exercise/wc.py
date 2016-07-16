@@ -3,8 +3,8 @@
 
 import sys
 
-data = sys.stdin.read()
-
+fd = open(sys.argv[1])
+data = fd.read()
 chars = len(data)
 words = len(data.split())
 lines = data.count('\n')
