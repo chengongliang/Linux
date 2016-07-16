@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
-from optprase import OptionParser
-import os
+from optparse import OptionParser
 import sys
 
 parser = OptionParser()
