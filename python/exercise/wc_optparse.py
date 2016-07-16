@@ -42,7 +42,4 @@ if options.lines:
 if options.words:
     print words,
 if options.chars:
-    print chars,
-    
-    
-    
+    print chars,   
