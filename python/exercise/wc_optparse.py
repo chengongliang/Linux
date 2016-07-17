@@ -44,11 +44,22 @@ def main():
     if not (options.lines or options.words or options.chars):
         options.lines, options.words, options.chars = True, True, True
     if args:
-        fn = args[0]
-        with open(fn) as fd:
-            data = fd.read()
-        lines, words, chars = get_count(data)
-        print_wc(options, lines, words, chars, fn)
+        total_lines, total_words, total_chars = 0, 0, 0
+        for fn in args:
+            if os.path.isfile(fn):
+                with open(fn) as fd:
+                    data = fd.read()
+                lines, words, chars = get_count(data)
+                print_wc(options, lines, words, chars, fn)
+                total_lines += lines
+                total_words += words
+                total_chars += chars 
+            elif os.path.isdir(fn):
+                print >> sys.stderr, "%s: is a directory" % fn
+            else:
+                sys.stderr.write("%s: No such file or directory\n" % fn)
+        if len(args) > 1:
+            print_wc(options, total_lines, total_words, total_chars, 'total')
     else:
         data = sys.stdin.read()
         fn = ''
