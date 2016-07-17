@@ -25,7 +25,7 @@ def opt():
                       dest="nototal",
                       action="store_true",
                       default=False,
-                      help="only count lines")
+                      help="show total or not")
     options, args = parser.parse_args()
     return options, args
 
@@ -63,9 +63,8 @@ def main():
                 print >> sys.stderr, "%s: is a directory" % fn
             else:
                 sys.stderr.write("%s: No such file or directory\n" % fn)
-        if len(args) > 1:
-            if not options.nototal:
-                print_wc(options, total_lines, total_words, total_chars, 'total')
+        if len(args) > 1 and if not options.nototal:
+            print_wc(options, total_lines, total_words, total_chars, 'total')
     else:
         data = sys.stdin.read()
         fn = ''
