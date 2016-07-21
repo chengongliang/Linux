@@ -32,8 +32,8 @@ del(){
     grep ${1} ${authFile} ${passwdFile} > /dev/null
     if [ $? == 0 ];then
         sed -i "/${1}/d" $passwdFile
-	sed -i "s/${1}, //g" $authFile
-	echo -e "\033[32m${1} has been deleted!\033[0m"
+	     sed -i "s/${1}, //g" $authFile
+	     echo -e "\033[32m${1} has been deleted!\033[0m"
     else
         echo -e "\033[33m${1} not in ${passwdFile}\033[0m"
         exit
