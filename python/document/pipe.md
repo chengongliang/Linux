@@ -1,5 +1,4 @@
 ###管道
-```
     #!/usr/bin/python
     from subprocess import Popen, PIPE
     
@@ -8,4 +7,3 @@
     result = p2.stdout
     for i in result:
         print i
-```
