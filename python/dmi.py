@@ -25,7 +25,16 @@ def parseDmi():
             else:
                 break
     return lines
-    
-if __name__ == '__main__':
+   
+def dmiDic():
+    dmi_dic = {}
     data = getDmi()
-    print parseDmi(data)
+    lines = parseDmi(data)
+    dic = dict([i.strip().split(': ') for i in lines]
+    dmi_dic['vendor'] = dic['Manufacturer']
+    dmi_dic['profuct'] = dic['Product Name']
+    dmi_dic['sn'] = dic['Serial Number']
+    return dmi_dic
+ 
+if __name__ == '__main__':
+    print dmiDic()
