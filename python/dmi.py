@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#coding:utf8
 
 from subprocess import Popen, PIPE
 
@@ -19,7 +20,7 @@ def parseDmi():
             continue
         if line_in:
             if not line[0].strip():
-            ##移除第一个字符为空格或tab，not转换为True
+            ##移除字符串的空格和tab
                 lines.append(line)
             else:
                 break
