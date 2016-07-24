@@ -3,6 +3,41 @@
 
 from subprocess import Popen, PIPE
 
+def getHostname(f):
+	with open(f) as fd:
+		for line in fd:
+			if line.startswith('HOSTNAME'):
+				hostname = line.split('=')[1].strip()
+				break
+	return {'Hostname':hostname}
+
+def getOSver(f):
+	with open(f) as fd:
+		for line in fd:
+			osver = line.strip()
+			break
+	return {'OSversion':osver}
+
+def getCPU(f):
+	num = 0
+	with open(f) as fd:
+		for line in fd:
+			if line.startswith('processor'):
+				num += 1
+			if line.startswith('model name'):
+				cpu_model = line.split(':')[1].split()
+				cpu_model = cpu_model[0]+' '+cpu_model[3]+' '+cpu_model[-1]
+		return {'cpu_num':num, 'cpu_model':cpu_model}
+
+def getMemory(f):
+	with open(f) as fd:
+		for line in fd:
+			if line.startswith('MemTotal'):
+				mem = int(line.split()[1].strip())
+				break
+	mem = "%s" % (mem/1024.0)+'M'
+	return {'memory':mem}
+
 def getIP():
 	p = Popen(['ifconfig'],stdout=PIPE)
 	data = p.stdout.read()
@@ -49,9 +84,21 @@ def parseDmi(parsed_data):
 	return dic
 
 if __name__ == '__main__':
+	dic = {}
 	data_ip = getIP()
 	parsed_data_ip = parseData(data_ip)
-	print parseIfconfig(parsed_data_ip)
+	ip = parseIfconfig(parsed_data_ip)
 	data_dmi = getDmi()
 	parsed_data_dmi = parseData(data_dmi)
-	print parseDmi(parsed_data_dmi)
+	dmi = parseDmi(parsed_data_dmi)
+	hostname = getHostname('/etc/sysconfig/network')
+	osver = getOSver('/etc/issue')
+	cpu = getCPU('/proc/cpuinfo')
+	mem = getMemory('/proc/meminfo')
+	dic.update(ip)
+	dic.update(dmi)
+	dic.update(cpu)
+	dic.update(mem)
+	dic.update(hostname)
+	dic.update(osver)
+	print dic
