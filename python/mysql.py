@@ -21,7 +21,7 @@ class MySQLConfig(ConfigParser):
             self.mysqld_vars[k] = v
     
     def set_vars(self, k, v):
-        set_mysqld_vars[k] = v
+        self.mysqld_vars[k] = v
             
     def get_mysqld_vars(self):
         rst = {}
