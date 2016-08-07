@@ -19,6 +19,9 @@ class MySQLConfig(ConfigParser):
         for k, v in kw.items():
             setattr(self, k, v)
             self.mysqld_vars[k] = v
+    
+    def set_vars(self, k, v):
+        set_mysqld_vars[k] = v
             
     def get_mysqld_vars(self):
         rst = {}
@@ -52,7 +55,9 @@ class MySQLConfig(ConfigParser):
             self.write(fd)
             
 if __name__ == '__main__':
-    mc = MySQLConfig('/etc/my.cnf', max_connections=200, port=3306)
+    mc = MySQLConfig('/etc/my.cnf', max_connections=200)
+    mc.set_vars('skip-slave-start', None)
+    mc.set_vars('port', 3306)
     mc.save()
     print mc.max_connections
     print mc.port
