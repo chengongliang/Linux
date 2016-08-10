@@ -37,6 +37,9 @@ def parseProject(pro, **args):
 def backup():
 	pass
 
+def rollback():
+	pass
+
 def rsync(testServer,destDir,exclude):
 	cmd = 'rsync -apv --delete --exclude={%s} %s:%s %s' % (exclude, testServer, destDir, destDir)
 	os.system(cmd)
