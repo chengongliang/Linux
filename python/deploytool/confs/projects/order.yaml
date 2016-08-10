@@ -1,0 +1,9 @@
+order:
+  dest:
+    /home/wwwroot/order.iclassedu.com/
+  tmp:
+    /srv/salt/wwwroot/files/order/order.iclassedu.com/
+  exclude:
+    conf
+    logs
+    *.pid
