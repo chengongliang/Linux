@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#coding:utf8
 
 import os
 import yaml
@@ -44,6 +45,28 @@ def rsync(testServer,destDir,exclude):
 	cmd = 'rsync -apv --delete --exclude={%s} %s:%s %s' % (exclude, testServer, destDir, destDir)
 	os.system(cmd)
 
+def getPID(project):
+	cmd = "ps -ef|grep -v grep|grep %s|awk '{print $2}'" % project
+	return os.system(cmd)
+
+def startTomcat(project):
+	binPath = os.join(destDir,"bin")
+	cmd = "cd %s && ./startup.sh" % binPath
+	try:
+		os.system(cmd)
+		print "%s 已经启动" % project
+	except OSError, e:
+		print"启动失败!"
+
+def stopTomcat(project):
+	import signal
+	pid = getPID(project)
+	try:
+		a = os.kill(pid, signal.SIGKILL)
+		print "%s 的进程已停止,PID: %s, 返回值: %s" % (project, pid, a)
+	except OSError, e:
+		print "%s 没有运行" % project
+
 def update(hostname, project, exclude, destDir, tmpDir):
 	#from salt.client import LocalClient
 	#local = LocalClient()
@@ -62,8 +85,14 @@ if __name__ == "__main__":
 	destDir = dirinfo[project]['dest'][:] 
 	exclude = ','.join(dirinfo.get(project)['exclude'].split(' '))
 	if cmd == 'rsync':
-		testServer = '192.168.11.110'
-		rsync(testServer, destDir, exclude)
+		if dirinfo.get(project)['type'] == 'www':
+			testServer = '192.168.11.110'
+			rsync(testServer, destDir, exclude)
+		elif dirinfo.get(project)['type'] == 'tomcat':
+			testServer = '192.168.11.110'
+			rsync(testServer, destDir, exclude)
+			stopTomcat(project)
+			startTomcat(project)
 	elif cmd == 'update':
 		hostname = parseHost(host)
 		tmpDir = dirinfo.get(project)['tmp']
