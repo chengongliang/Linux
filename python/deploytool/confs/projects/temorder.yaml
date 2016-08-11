@@ -1,0 +1,8 @@
+temorder:
+  type: tomcat
+  dest: /home/webuser/tem-order/
+  tmp: /srv/salt/webuser/files/temorder/
+  exclude:
+    conf
+    logs
+    *.pid

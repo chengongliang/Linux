@@ -50,6 +50,8 @@ def rollback():
 
 def rsync(testServer,destDir,exclude):
 	cmd = 'rsync -apv --delete --exclude={%s} %s:%s %s' % (exclude, testServer, destDir, destDir)
+	if not os.path.exists(destDir):
+		os.makedirs(destDir)
 	os.system(cmd)
 
 def getPID(project):
@@ -74,13 +76,15 @@ def stopTomcat(project):
 	except OSError, e:
 		print "%s 没有运行" % project
 
-def update(hostname, project, exclude, destDir, tmpDir):
+def update(hostname, project, exclude, destDir, tmpDir, env):
 	#from salt.client import LocalClient
 	#local = LocalClient()
 	#print local.cmd(hostname, 'state.sls', [project])
 	sync = 'rsync -ap --delete --exclude={%s} %s %s' % (exclude, destDir, tmpDir)
+	if not os.path.exists(tmpDir):
+		os.makedirs(tmpDir)
 	os.system(sync)
-	salt = 'salt "%s" state.sls %s' % (hostname, project)
+	salt = 'salt "%s" state.sls %s %s' % (hostname, project, env)
 	os.system(salt)
 
 if __name__ == "__main__":
@@ -89,19 +93,20 @@ if __name__ == "__main__":
 	project = options.project
 	cmd = options.command
 	dirinfo = parseProject(project)
+	env = dirinfo.get(project)['type']
 	destDir = dirinfo[project]['dest'][:] 
 	exclude = ','.join(dirinfo.get(project)['exclude'].split(' '))
 	if cmd == 'rsync':
-		if dirinfo.get(project)['type'] == 'www':
+		if env == 'www':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
 			backup(project, destDir)
-		elif dirinfo.get(project)['type'] == 'tomcat':
+		elif env == 'tomcat':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
-			stopTomcat(project)
-			startTomcat(project)
+		#	stopTomcat(project)
+		#	startTomcat(project)
 	elif cmd == 'update':
 		hostname = parseHost(host)
 		tmpDir = dirinfo.get(project)['tmp']
-		update(hostname, project, exclude, destDir, tmpDir)
+		update(hostname, project, exclude, destDir, tmpDir, env)
