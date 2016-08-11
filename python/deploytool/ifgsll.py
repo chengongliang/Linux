@@ -35,8 +35,15 @@ def parseProject(pro, **args):
 	dirinfo = yaml.load(file(projCNF))
 	return dirinfo
 
-def backup():
-	pass
+def backup(project, destDir):
+	import datetime
+	today = datetime.date.today()
+	BACK_DIR = "/home/ifgsll/backup/"
+	backDir = BACK_DIR + today.isoformat()
+	if not os.path.exists(backDir):
+		os.makedirs(backDir)
+	cmd = "cp -rf %s %s" % (destDir, backDir)
+	os.system(cmd)
 
 def rollback():
 	pass
@@ -88,6 +95,7 @@ if __name__ == "__main__":
 		if dirinfo.get(project)['type'] == 'www':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
+			backup(project, destDir)
 		elif dirinfo.get(project)['type'] == 'tomcat':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
