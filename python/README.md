@@ -1,1 +1,1 @@
-[deploytool](./deployetool)
+[deploytool](./deploytool)
