@@ -1,6 +1,6 @@
-/home/wwwroot/order.iclassedu.com/:
+/home/wwwroot/www.iclassedu.com/:
   file.recurse:
-    - source: salt://files/order.iclassedu.com/
+    - source: salt://files/www.iclassedu.com/
     - file_mode: 644
     - dir_mode: 755
     - makedir: True

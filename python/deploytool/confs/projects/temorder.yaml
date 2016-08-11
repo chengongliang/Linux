@@ -1,7 +1,7 @@
 temorder:
   type: tomcat
   dest: /home/webuser/tem-order/
-  tmp: /srv/salt/webuser/files/temorder/
+  tmp: /srv/salt/webuser/files/tem-order/
   exclude:
     conf
     logs
