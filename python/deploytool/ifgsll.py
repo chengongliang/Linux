@@ -57,7 +57,7 @@ def getPID(project):
 	return os.system(cmd)
 
 def startTomcat(project):
-	binPath = os.join(destDir,"bin")
+	binPath = destDir + "bin"
 	cmd = "cd %s && ./startup.sh" % binPath
 	try:
 		os.system(cmd)
