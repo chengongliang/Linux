@@ -2,6 +2,7 @@
 #coding:utf8
 
 import os
+import sys
 import yaml
 from optparse import OptionParser
 
@@ -11,7 +12,7 @@ def opt():
 	parser.add_option('-p','--porject',
 					dest='project',
 					action='store',
-					help='project')
+					help='order,temorder')
 	parser.add_option('-l','--host',
 					dest='host',
 					action='store',
@@ -19,7 +20,7 @@ def opt():
 	parser.add_option('-c','--command',
 					dest='command',
 					action='store',
-					help='command')
+					help='rsync,update,rollback,start,stop,restart')
 	options, args = parser.parse_args()
 	return options, args
 
@@ -30,8 +31,11 @@ def parseHost(host, **args):
 		if host in i.split('-'):
 			return hostinfo[i]['hostname'][:]
 
-def parseProject(pro, **args):
+def parseProject(project, **args):
 	projCNF = os.path.join('%s' % cwd,'confs','projects','%s.yaml' % project)
+	if not os.path.exists(projCNF):
+		print "%s 不存在" % project
+		sys.exit(1)
 	dirinfo = yaml.load(file(projCNF))
 	return dirinfo
 
@@ -110,3 +114,6 @@ if __name__ == "__main__":
 		hostname = parseHost(host)
 		tmpDir = dirinfo.get(project)['tmp']
 		update(hostname, project, exclude, destDir, tmpDir, env)
+	else:
+		print "command %s not support!\nPlease use %s -h to show helpinfo." % (cmd, __file__)
+		sys.exit(1)
