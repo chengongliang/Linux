@@ -1,11 +1,15 @@
 /home/webuser/tem-order/:
   file.recurse:
     - source: salt://files/tem-order/
-    - file_mode: 744
-    - dir_mode: 755
     - makedir: True
     - include_empty: True
     - clean: True
+/home/webuser/tem-order/bin/:
+  file.directory:
+    - dir_mode: 755
+    - file_mode: 755
+    - recurse:
+      - mode
 stop:
   cmd.run:
     - name: /home/webuser/tem-order/bin/shutdown.sh
