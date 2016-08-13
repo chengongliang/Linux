@@ -73,28 +73,28 @@ def getPID(host, project):
 		print "程序未运行。"
 		sys.exit(1)
 
-def startTomcat(project):
+def startTomcat(hostname, destDir):
 	binPath = destDir + "bin"
-	cmd = "cd %s && ./startup.sh" % binPath
+	cmd = "sh %s/startup.sh" % binPath
+	cmd_run = "salt '%s' cmd.run '%s'" % (hostname, cmd)
+	project = destDir.split('/')[-2]
 	try:
-		os.system(cmd)
+		os.system(cmd_run)
 		print "%s 已经启动" % project
 	except OSError, e:
 		print"启动失败!"
 
-def stopTomcat(host, project):
-	pid = getPID(host, project)
-	cmd = "salt '%s' cmd.run 'kill -9 %s'" % (host, pid)
+def stopTomcat(hostname, destDir):
+	pid = getPID(hostname, destDir)
+	cmd = "salt '%s' cmd.run 'kill -9 %s'" % (hostname, pid)
 	os.system(cmd)
+	project = destDir.split('/')[-2]
 	try:
 		print "%s 的进程已停止,PID: %s" % (project, pid)
 	except OSError, e:
 		print "%s 停止失败" % project
 
 def update(hostname, project, exclude, destDir, tmpDir, env):
-	#from salt.client import LocalClient
-	#local = LocalClient()
-	#print local.cmd(hostname, 'state.sls', [project])
 	sync = 'rsync -ap --delete --exclude={%s} %s %s' % (exclude, destDir, tmpDir)
 	if not os.path.exists(tmpDir):
 		os.makedirs(tmpDir)
@@ -119,8 +119,6 @@ if __name__ == "__main__":
 		elif env == 'tomcat':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
-		#	stopTomcat(testServer, project)
-		#	startTomcat(project)
 	elif cmd == 'update':
 		hostname = parseHost(host)
 		tmpDir = dirinfo.get(project)['tmp']
@@ -129,9 +127,15 @@ if __name__ == "__main__":
 		if env == 'tomcat':
 			hostname = parseHost(host)
 			stopTomcat(hostname, destDir)
-		else:
-			print "命令有误，请检查"
-			sys.exit(1)
+	elif cmd == 'start':
+		if env == 'tomcat':
+			hostname = parseHost(host)
+			startTomcat(hostname, destDir)
+	elif cmd == 'restart':
+		if env == 'tomcat':
+			hostname = parseHost(host)
+			stopTomcat(hostname, destDir)
+			startTomcat(hostname, destDir)
 	else:
 		print "command %s not support!\nPlease use %s -h to show helpinfo." % (cmd, __file__)
 		sys.exit(1)
