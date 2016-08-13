@@ -48,16 +48,16 @@ class BR:
 		today = datetime.date.today()
 		BACK_DIR = "/home/ifgsll/backup/"
 		self.backDir = BACK_DIR + today.isoformat()
+		self.p_back = self.backDir + '/' + destDir.split('/')[-2] + '/'
 
 	def backup(self, project, destDir):
 		if not os.path.exists(self.backDir):
 			os.makedirs(self.backDir)
-		cmd = "cp -rf %s %s" % (destDir, self.backDir)
-		os.system(cmd)
+		rsync = "rsync -avp --delete %s %s" % (destDir, self.p_back)
+		os.system(rsync)
 		
 	def rollback(self, project, destDir):
-		pjDir = self.backDir + '/' + destDir.split('/')[-2] + '/'
-		rsync = "rsync -avp --delete %s %s" % (pjDir, destDir)
+		rsync = "rsync -avp --delete %s %s" % (self.p_back, destDir)
 		os.system(rsync)
 
 def rsync(testServer,destDir,exclude):
