@@ -37,7 +37,7 @@ def parseHost(host, **args):
 def parseProject(project, **args):
 	projCNF = os.path.join('%s' % cwd,'confs','projects','%s.yaml' % project)
 	if not os.path.exists(projCNF):
-		print "%s 不存在" % project
+		print "%s 不存在或未配置" % project
 		sys.exit(1)
 	dirinfo = yaml.load(file(projCNF))
 	return dirinfo
@@ -146,5 +146,5 @@ if __name__ == "__main__":
 			stopTomcat(hostname, destDir)
 			startTomcat(hostname, destDir)
 	else:
-		print "command %s not support!\nPlease use %s -h to show helpinfo." % (cmd, __file__)
+		print "未知命令!\n请使用 %s -h 查看帮助信息" % __file__
 		sys.exit(1)
