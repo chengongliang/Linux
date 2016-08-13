@@ -42,18 +42,23 @@ def parseProject(project, **args):
 	dirinfo = yaml.load(file(projCNF))
 	return dirinfo
 
-def backup(project, destDir):
-	import datetime
-	today = datetime.date.today()
-	BACK_DIR = "/home/ifgsll/backup/"
-	backDir = BACK_DIR + today.isoformat()
-	if not os.path.exists(backDir):
-		os.makedirs(backDir)
-	cmd = "cp -rf %s %s" % (destDir, backDir)
-	os.system(cmd)
+class BR:
+	def __init__(self, project, destDir, **kw):
+		import datetime
+		today = datetime.date.today()
+		BACK_DIR = "/home/ifgsll/backup/"
+		self.backDir = BACK_DIR + today.isoformat()
 
-def rollback():
-	pass
+	def backup(self, project, destDir):
+		if not os.path.exists(self.backDir):
+			os.makedirs(self.backDir)
+		cmd = "cp -rf %s %s" % (destDir, self.backDir)
+		os.system(cmd)
+		
+	def rollback(self, project, destDir):
+		pjDir = self.backDir + '/' + destDir.split('/')[-2] + '/'
+		rsync = "rsync -avp --delete %s %s" % (pjDir, destDir)
+		os.system(rsync)
 
 def rsync(testServer,destDir,exclude):
 	cmd = 'rsync -apv --delete --exclude={%s} %s:%s %s' % (exclude, testServer, destDir, destDir)
@@ -112,17 +117,21 @@ if __name__ == "__main__":
 	destDir = dirinfo[project]['dest'][:] 
 	exclude = ','.join(dirinfo.get(project)['exclude'].split(' '))
 	if cmd == 'rsync':
+		br = BR(project, destDir)
 		if env == 'www':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
-			backup(project, destDir)
 		elif env == 'tomcat':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
+		br.backup(project, destDir)
 	elif cmd == 'update':
 		hostname = parseHost(host)
 		tmpDir = dirinfo.get(project)['tmp']
 		update(hostname, project, exclude, destDir, tmpDir, env)
+	elif cmd == 'rollback':
+		br = BR(project, destDir)
+		br.rollback(project, destDir)
 	elif cmd == 'stop':
 		if env == 'tomcat':
 			hostname = parseHost(host)
