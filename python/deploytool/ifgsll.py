@@ -30,6 +30,9 @@ def parseHost(host, **args):
 	for i in hostinfo:
 		if host in i.split('-'):
 			return hostinfo[i]['hostname'][:]
+	else:
+		print "ip或者hostname未写入配置"
+		sys.exit(1)
 
 def parseProject(project, **args):
 	projCNF = os.path.join('%s' % cwd,'confs','projects','%s.yaml' % project)
@@ -58,9 +61,17 @@ def rsync(testServer,destDir,exclude):
 		os.makedirs(destDir)
 	os.system(cmd)
 
-def getPID(project):
-	cmd = "ps -ef|grep -v grep|grep %s|awk '{print $2}'" % project
-	return os.system(cmd)
+def getPID(host, project):
+	from subprocess import Popen, PIPE
+	salt_cmd = "salt '%s' cmd.run 'ps -ef|grep -v grep|grep %s'" % (host,project)
+	p = Popen(salt_cmd, stdout=PIPE, stderr=PIPE, shell=True)
+	stdout, stderr = p.communicate()
+	if stderr.split(': ')[0] != 'ERROR':
+		pid = stdout.split('\n')[1].strip().split(' ')[6]
+		return pid
+	else:
+		print "程序未运行。"
+		sys.exit(1)
 
 def startTomcat(project):
 	binPath = destDir + "bin"
@@ -71,14 +82,14 @@ def startTomcat(project):
 	except OSError, e:
 		print"启动失败!"
 
-def stopTomcat(project):
-	import signal
-	pid = getPID(project)
+def stopTomcat(host, project):
+	pid = getPID(host, project)
+	cmd = "salt '%s' cmd.run 'kill -9 %s'" % (host, pid)
+	os.system(cmd)
 	try:
-		a = os.kill(pid, signal.SIGKILL)
-		print "%s 的进程已停止,PID: %s, 返回值: %s" % (project, pid, a)
+		print "%s 的进程已停止,PID: %s" % (project, pid)
 	except OSError, e:
-		print "%s 没有运行" % project
+		print "%s 停止失败" % project
 
 def update(hostname, project, exclude, destDir, tmpDir, env):
 	#from salt.client import LocalClient
@@ -108,12 +119,19 @@ if __name__ == "__main__":
 		elif env == 'tomcat':
 			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
-		#	stopTomcat(project)
+		#	stopTomcat(testServer, project)
 		#	startTomcat(project)
 	elif cmd == 'update':
 		hostname = parseHost(host)
 		tmpDir = dirinfo.get(project)['tmp']
 		update(hostname, project, exclude, destDir, tmpDir, env)
+	elif cmd == 'stop':
+		if env == 'tomcat':
+			hostname = parseHost(host)
+			stopTomcat(hostname, destDir)
+		else:
+			print "命令有误，请检查"
+			sys.exit(1)
 	else:
 		print "command %s not support!\nPlease use %s -h to show helpinfo." % (cmd, __file__)
 		sys.exit(1)
