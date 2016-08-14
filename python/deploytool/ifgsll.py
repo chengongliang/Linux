@@ -50,14 +50,14 @@ class BR:
 		self.backDir = BACK_DIR + today.isoformat()
 		self.p_back = self.backDir + '/' + destDir.split('/')[-2] + '/'
 
-	def backup(self, project, destDir):
+	def backup(self, project, destDir, exclude):
 		if not os.path.exists(self.backDir):
 			os.makedirs(self.backDir)
-		rsync = "rsync -avp --delete %s %s" % (destDir, self.p_back)
+		rsync = "rsync -avp --delete --exclude={%s} %s %s" % (exclude, destDir, self.p_back)
 		os.system(rsync)
 		
-	def rollback(self, project, destDir):
-		rsync = "rsync -avp --delete %s %s" % (self.p_back, destDir)
+	def rollback(self, project, destDir, exclude):
+		rsync = "rsync -avp --delete --exclude={%s} %s %s" % (exclude, self.p_back, destDir)
 		os.system(rsync)
 
 def rsync(testServer,destDir,exclude):
@@ -118,11 +118,10 @@ if __name__ == "__main__":
 	exclude = ','.join(dirinfo.get(project)['exclude'].split(' '))
 	if cmd == 'rsync':
 		br = BR(project, destDir)
+		testServer = '192.168.11.110'
 		if env == 'www':
-			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
 		elif env == 'tomcat':
-			testServer = '192.168.11.110'
 			rsync(testServer, destDir, exclude)
 		br.backup(project, destDir)
 	elif cmd == 'update':
