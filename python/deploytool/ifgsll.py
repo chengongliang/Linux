@@ -123,14 +123,14 @@ if __name__ == "__main__":
 			rsync(testServer, destDir, exclude)
 		elif env == 'tomcat':
 			rsync(testServer, destDir, exclude)
-		br.backup(project, destDir)
+		br.backup(project, destDir, exclude)
 	elif cmd == 'update':
 		hostname = parseHost(host)
 		tmpDir = dirinfo.get(project)['tmp']
 		update(hostname, project, exclude, destDir, tmpDir, env)
 	elif cmd == 'rollback':
 		br = BR(project, destDir)
-		br.rollback(project, destDir)
+		br.rollback(project, destDir, exclude)
 	elif cmd == 'stop':
 		if env == 'tomcat':
 			hostname = parseHost(host)
