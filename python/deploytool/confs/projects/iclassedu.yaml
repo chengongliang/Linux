@@ -1,8 +1,0 @@
-iclassedu:
-  type: www
-  dest: /home/wwwroot/www.iclassedu.com/
-  tmp: /srv/salt/wwwroot/files/www.iclassedu.com/
-  exclude:
-    conf
-    logs
-    *.pid
