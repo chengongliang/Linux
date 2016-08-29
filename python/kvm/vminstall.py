@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
+import os
+import sys
+import time
 import random
+import libvirt
 from vmconfig import readConfs
 from subprocess import Popen, PIPE
 
@@ -122,8 +126,73 @@ def getPort():
         new_port = 5901
     return {'port': new_port}
 
+def getName(name):
+    if not checkName(name):
+        sys.exit(1)
+    disk = os.path.join('/virtual','%s.img' % name)
+    cmd = "dd if=/dev/zero of=%s bs=1M count=1 seek=8192 &> /dev/null" % disk
+    os.system(cmd)
+    return {'name': name, 'disk': disk}
+
+def checkName(name):
+    names = []
+    vm_msg = readConfs()
+    if vm_msg:
+        for i in vm_msg:
+            names += i.keys()
+        if name in names:
+            print """
+                VM NAME: %s is exists
+                exists: %s""" % (name, names)
+            return False
+    return True
+
+def createVM(vconn, name, xml):
+    vconn.defineXML(xml)
+    vm = vconn.lookupByName(name)
+    vm.create()
+
+def run_vm(vconn, xml, name):
+    lines = []
+    data = xml.split('\n')
+    for line in data:
+        if line.strip().startswith('<kernel>'):
+            continue
+        elif line.strip().startswith('<initrd>'):
+            continue
+        elif line.strip().startswith('<cmdline>'):
+            continue
+        elif line.strip().startswith('<on_reboot>'):
+            line = line.replace('destroy', 'restart')
+            lines.append(line)
+        elif line.strip().startswith('<on_crash>'):
+            line = line.replace('destroy', 'restart')
+            lines.append(line)
+        else:
+            lines.append(line)
+    run_xml = '\n'.join(lines)
+    vm = vconn.lookupByName(name)
+    vm.undefine()
+    vconn.defineXML(run_xml)
+
+def main():
+    try:
+        name = sys.argv[1]
+    except IndexErrot:
+        print "%s follow an argument" % __file__
+        sys.exit(1)
+    dic = {}
+    vconn = libvirt.open('qemu:///system')
+    dic.update(getUUID())
+    dic.update(getIP())
+    dic.update(getMAC())
+    dic.update(getPort())
+    dic.update(getName(name))
+    xml = XML % dic
+    createVM(vconn, name, xml)
+    print """
+          VNC Port: %s""" % dic['port']
+    time.sleep(10)
+
 if __name__ == '__main__':
-    print getUUID()
-    print getIP()
-    print getMAC()
-    print getPort()
+    main()
