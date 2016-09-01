@@ -27,7 +27,7 @@ def getUrl(html):
     items = re_img.findall(html)
     url_list = []
     for url,oo,xx in items:
-        if int(oo)/int(xx) > 5:
+        if int(oo)/int(xx) > 9:
             url_list.append(url)
     return url_list
 
@@ -37,7 +37,7 @@ def getCurrent():
     page = current.findall(start_page)[0]
     return page
 
-def download(url_list):
+def download(html, url_list):
     i = 1
     for url in url_list:
         if url[-3:] == "jpg":
@@ -53,10 +53,16 @@ def download(url_list):
             urllib.urlretrieve(org_url[0], filename="%s.gif" %i)
             i += 1
 
-if __name__ == "__main__":
+def main():
     page = getCurrent()
-    url = 'http://jandan.net/ooxx/page-%s#comments' % page
-    html = getHtml(url)
-    url_list = getUrl(html)
-    print url_list
-    #download(url_list)
+    list_pages = range(int(page)-10,int(page)+1)
+    print list_pages 
+    for p in list_pages:
+        url = 'http://jandan.net/ooxx/page-%s#comments' % p
+        html = getHtml(url)
+        url_list = getUrl(html)
+      #  print url_list
+        download(html,url_list)
+
+if __name__ == "__main__":
+    main()
