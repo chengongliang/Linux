@@ -3,12 +3,20 @@
 
 import re
 import sys
+import random
 import urllib, urllib2
 
 def getHtml(url):
    # headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
    # headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/42.0'}
-    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393'}
+   # headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393'}
+    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:43.0) Gecko/20100101 Firefox/43.0'}
+    #proxies = ['180.103.131.65:808','124.240.187.78:81','118.180.15.152:8102']
+    #proxy = random.choice(proxies)
+    #proxy_support = urllib2.ProxyHandler({'http':proxy})
+    #opener = urllib2.build_opener(proxy_support)
+    #urllib2.install_opener(opener)
+
     try:
         request = urllib2.Request(url, headers=headers)
         response = urllib2.urlopen(request)
@@ -24,11 +32,16 @@ def getHtml(url):
 
 def getUrl(html):
     re_img = re.compile(r'<div class="text">.*?<p>.*?<img src="(http://ww.*?)".*?<div class="vote".*?<span id="cos_support.*?">(\d+)</span>.*?<span id="cos_unsupport.*?">(\d+)</span>', re.S)
-    items = re_img.findall(html)
     url_list = []
+    items = re_img.findall(html)
     for url,oo,xx in items:
         if int(oo)/int(xx) > 9:
             url_list.append(url)
+            if url[-3:] == 'gif':
+                index = url_list.index(url)
+                re_gif = re.compile(r'%s.*?org_src="(.*?)"'%url)
+                org_url = re_gif.findall(html)
+                url_list[index] = org_url
     return url_list
 
 def getCurrent():
@@ -37,21 +50,29 @@ def getCurrent():
     page = current.findall(start_page)[0]
     return page
 
+def save_img(url,name):
+    with open(name, 'wb') as fd:
+        img = getHtml(url)
+        fd.write(img)
+
 def download(html, url_list):
     i = 1
     for url in url_list:
-        if url[-3:] == "jpg":
-            try:
-                urllib.urlretrieve(url, filename="%s.jpg" %i)
-                i += 1
-            except urllib.ContentTooShortError:
-                print "Network conditions is not good.Reloading"
-                urllib.urlretrieve(url, filename="%s.jpg" %i)
-        elif url[-3:] == "gif":
-            re_gif = re.compile(r'%s.*?org_src="(.*?)"'%url)
-            org_url = re_gif.findall(html)
-            urllib.urlretrieve(org_url[0], filename="%s.gif" %i)
-            i += 1
+        name = url.split('/')[-1]
+#        if url[-3:] == "jpg":
+        save_img(url,name)
+#            i += 1
+#            try:
+#                urllib.urlretrieve(url, filename="%s.jpg" %i)
+#                i += 1
+#            except urllib.ContentTooShortError:
+#                print "Network conditions is not good.Reloading"
+#                urllib.urlretrieve(url, filename="%s.jpg" %i)
+#        elif url[-3:] == "gif":
+#            re_gif = re.compile(r'%s.*?org_src="(.*?)"'%url)
+#            org_url = re_gif.findall(html)
+#            urllib.urlretrieve(org_url[0], filename="%s.gif" %i)
+#            i += 1
 
 def main():
     page = getCurrent()
