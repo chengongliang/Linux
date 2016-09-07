@@ -8,8 +8,6 @@ import urllib, urllib2
 
 def getHtml(url):
    # headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
-   # headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/42.0'}
-   # headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393'}
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:43.0) Gecko/20100101 Firefox/43.0'}
     #proxies = ['180.103.131.65:808','124.240.187.78:81','118.180.15.152:8102']
     #proxy = random.choice(proxies)
@@ -41,7 +39,7 @@ def getUrl(html):
                 index = url_list.index(url)
                 re_gif = re.compile(r'%s.*?org_src="(.*?)"'%url)
                 org_url = re_gif.findall(html)
-                url_list[index] = org_url
+                url_list[index] = org_url[0]
     return url_list
 
 def getCurrent():
@@ -56,7 +54,7 @@ def save_img(url,name):
         fd.write(img)
 
 def download(html, url_list):
-    i = 1
+#    i = 1
     for url in url_list:
         name = url.split('/')[-1]
 #        if url[-3:] == "jpg":
