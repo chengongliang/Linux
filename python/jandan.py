@@ -7,7 +7,6 @@ import random
 import urllib, urllib2
 
 def getHtml(url):
-   # headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:43.0) Gecko/20100101 Firefox/43.0'}
     #proxies = ['180.103.131.65:808','124.240.187.78:81','118.180.15.152:8102']
     #proxy = random.choice(proxies)
@@ -54,23 +53,9 @@ def save_img(url,name):
         fd.write(img)
 
 def download(html, url_list):
-#    i = 1
     for url in url_list:
         name = url.split('/')[-1]
-#        if url[-3:] == "jpg":
         save_img(url,name)
-#            i += 1
-#            try:
-#                urllib.urlretrieve(url, filename="%s.jpg" %i)
-#                i += 1
-#            except urllib.ContentTooShortError:
-#                print "Network conditions is not good.Reloading"
-#                urllib.urlretrieve(url, filename="%s.jpg" %i)
-#        elif url[-3:] == "gif":
-#            re_gif = re.compile(r'%s.*?org_src="(.*?)"'%url)
-#            org_url = re_gif.findall(html)
-#            urllib.urlretrieve(org_url[0], filename="%s.gif" %i)
-#            i += 1
 
 def main():
     page = getCurrent()
@@ -80,7 +65,6 @@ def main():
         url = 'http://jandan.net/ooxx/page-%s#comments' % p
         html = getHtml(url)
         url_list = getUrl(html)
-      #  print url_list
         download(html,url_list)
 
 if __name__ == "__main__":
