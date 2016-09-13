@@ -152,10 +152,10 @@ install_nginx() {
     chmod 755 /etc/init.d/nginx
     chkconfig --add nginx
     chkconfig nginx on
+    useradd -M -s /sbin/nologin www
     check_ok
     service nginx start
     check_ok
-    useradd -M -s /sbin/nologin www
     mkdir /home/www
     echo -e "<?php\n    phpinfo();\n?>" > /home/www/index.php
     check_ok
