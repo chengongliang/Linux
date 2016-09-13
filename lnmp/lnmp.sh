@@ -100,7 +100,6 @@ install_mysqld() {
 }
 
 
-
 ##function of check service is running or not, example nginx, php-fpm.
 check_service() {
 if [ "$1" == "phpfpm" ]
@@ -156,6 +155,7 @@ install_nginx() {
     check_ok
     service nginx start
     check_ok
+    useradd -M -s /sbin/nologin www
     mkdir /home/www
     echo -e "<?php\n    phpinfo();\n?>" > /home/www/index.php
     check_ok
@@ -242,9 +242,9 @@ source /etc/profile
 echo "The lnmp done, Please use 'http://your ip/index.php' to access."
 }
 
-read -p "Please enter what you want install  (lnmp|mysql|nginx|phpfpm|redis)" t
+echo -e "\033[35mPlease enter what you want install  (lnmp|mysql|nginx|phpfpm|redis)\033[0m"
+read -a t
 case $t in
-
     lnmp)
         lnmp
         ;;
@@ -261,7 +261,6 @@ case $t in
         install_redis
         ;;
     *)
-        echo "Only 'yes' your can input."
+        echo "Only 'lnmp|mysql|nginx|phpfpm|redis' your can input."
         ;;
 esac
-##########end##############
