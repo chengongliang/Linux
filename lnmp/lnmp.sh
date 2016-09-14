@@ -215,6 +215,7 @@ install_redis(){
     mkdir /usr/local/redis/{etc,var}
     \cp conf/redis.conf /usr/local/redis/etc/redis.conf
     /usr/local/redis/bin/redis-server /usr/local/redis/etc/redis.conf
+    echo "/usr/local/redis/bin/redis-server /usr/local/redis/etc/redis.conf" > /etc/rc.local
     check_ok
 }
 
@@ -239,7 +240,7 @@ check_service nginx
 check_service phpfpm
 echo "export PATH=\$PATH:/usr/local/mysql/bin:/usr/local/redis/bin:/usr/local/php/sbin:/usr/local/php/bin:/usr/local/nginx/sbin" >> /etc/profile
 source /etc/profile
-echo "The lnmp done, Please use 'http://your ip/index.php' to access."
+echo -e "\033[34mThe lnmp done, Please use 'http://your ip/index.php' to access.\033[0m"
 }
 
 echo -e "\033[35mPlease enter what you want install  (lnmp|mysql|nginx|phpfpm|redis)\033[0m"
