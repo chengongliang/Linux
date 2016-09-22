@@ -11,7 +11,7 @@ db_list=`/alidata/server/mysql/bin/mysql -u${user} -p${passwd} -e "show database
 [ -d ${back_dir} ] || mkdir -p ${back_dir}
 for dbname in ${db_list};
 do
-    /alidata/server/mysql/bin/mysqldump -u${user} -p${passwd} -B ${dbname} > ${back_dir}/${dbname}.sql 
+    /alidata/server/mysql/bin/mysqldump -u${user} -p${passwd} -x -B ${dbname} > ${back_dir}/${dbname}.sql 
 done
 cd /data/db_back
 if [[ $(pwd) == "/data/db_back" ]];then
