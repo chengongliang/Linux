@@ -3,9 +3,6 @@
 
 import re
 import sys
-import random
-import cookielib
-import urllib, urllib2
 import requests
 
 def getHtml(url):
