@@ -6,44 +6,32 @@ import sys
 import random
 import cookielib
 import urllib, urllib2
+import requests
 
 def getHtml(url):
- #   headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:43.0) Gecko/20100101 Firefox/43.0'}
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
-    cookie = cookielib.CookieJar()
-    handler = urllib2.HTTPCookieProcessor(cookie)
-    opener = urllib2.build_opener(handler)
-    #proxies = ['180.103.131.65:808','124.240.187.78:81','118.180.15.152:8102']
-    #proxy = random.choice(proxies)
-    #proxy_support = urllib2.ProxyHandler({'http':proxy})
-    #opener = urllib2.build_opener(proxy_support)
-    #urllib2.install_opener(opener)
+    headers1 = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:43.0) Gecko/20100101 Firefox/43.0'}
+    headers2 = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
 
-    try:
-        request = urllib2.Request(url, headers=headers)
-        response = opener.open(request)
-        html = response.read()
+    request = requests.get(url, headers=headers1)
+    if request.ok:
+        html = request.content
         return html
-    except urllib2.URLError, e:
-        if hasattr(e, "code"):
-            print "连接服务器失败,错误代码: %s" %e.code
-            return None
-        if hasattr(e, "reason"):
-            print "连接服务器失败,错误原因: %s" %e.reason
-            return None
+    else:
+        request = requests.get(url, headers=headers2)
+        if request.ok:
+            html = request.content
+            return html
+        else:
+            print "连接服务器失败，错误码：%s" % request.status_code
+            sys.exit(1)
 
 def getUrl_list(html):
-    re_img = re.compile(r'<div class="text">.*?<p>.*?<img src="(http://ww.*?)".*?<div class="vote".*?<span id="cos_support.*?">(\d+)</span>.*?<span id="cos_unsupport.*?">(\d+)</span>', re.S)
+    re_img = re.compile(r'<div class="text">.*?<p>.*?<a href="(http://ww.*?)".*?<div class="vote".*?<span id="cos_support.*?">(\d+)</span>.*?<span id="cos_unsupport.*?">(\d+)</span>', re.S)
     url_list = []
     items = re_img.findall(html)
     for url,oo,xx in items:
         if int(oo) >= 200 and int(xx) <= 30:
             url_list.append(url)
-            if url[-3:] == 'gif':
-                index = url_list.index(url)
-                re_gif = re.compile(r'%s.*?org_src="(.*?)"'%url)
-                org_url = re_gif.findall(html)
-                url_list[index] = org_url[0]
     return url_list
 
 def getCurrent():
@@ -58,7 +46,6 @@ def save_img(url,name):
         fd.write(img)
 
 def download(html, url_list):
-    url_list = getUrl_list(html)
     for url in url_list:
         name = url.split('/')[-1]
         save_img(url,name)
