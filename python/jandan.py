@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #encoding:utf8
+#author:chengongliang
 
 import re
 import sys
@@ -42,7 +43,7 @@ def save_img(url,name):
         img = getHtml(url)
         fd.write(img)
 
-def download(html, url_list):
+def download(url_list):
     for url in url_list:
         name = url.split('/')[-1]
         save_img(url,name)
@@ -53,9 +54,10 @@ def main():
     print list_pages
     for p in list_pages:
         url = 'http://jandan.net/ooxx/page-%s#comments' % p
+        print "~~正在下载第%s页~~" % p
         html = getHtml(url)
         url_list = getUrl_list(html)
-        download(html,url_list)
+        download(url_list)
 
 if __name__ == "__main__":
     main()
