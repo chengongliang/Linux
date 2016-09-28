@@ -5,7 +5,6 @@
 import re
 import os
 import sys
-#import random
 import requests
 from conf import setting
 
