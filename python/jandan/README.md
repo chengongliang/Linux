@@ -4,3 +4,8 @@
 
 1. 导入conf目录下data.sql
 2. 运行python getImg.py
+
+---
+TODO:
+- 段子
+- 无聊图
