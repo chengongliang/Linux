@@ -30,6 +30,10 @@ class mySQL():
         self.conn.commit()
         #self.close()
 
+    def put_ooxx(self,url,oo,xx):
+        self.cur.execute("INSERT INTO `jandan`.`ooxx` (`url`, `oo`, `xx`) SELECT %s, %s, %s FROM dual WHERE NOT EXISTS (SELECT url FROM ooxx WHERE url = %s)",[url,oo,xx,url])
+        self.conn.commit()
+
     def close(self):
         self.cur.close()
         self.conn.close()

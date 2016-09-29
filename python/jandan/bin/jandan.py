@@ -34,6 +34,7 @@ def getUrl_list(html):
     items = re_img.findall(html)
     for url,oo,xx in items:
         if int(oo) >= 150 and int(xx) <= 30:
+            s.put_ooxx(url,oo,xx)
             url_list.append(url)
     return url_list
 
