@@ -5,12 +5,16 @@
 import re
 import os
 import sys
+#import random
 import requests
+from sql import mySQL
 from conf import setting
 
+s = mySQL()
 def getHtml(url):
     n = 0
-    agent = setting.configs['agents']
+    #agent = setting.configs['agents']
+    agent = s.get_agent()
     while n < len(agent):
         headers = {'User-Agent':agent[n]}
         request = requests.get(url, headers=headers)
@@ -29,7 +33,7 @@ def getUrl_list(html):
     url_list = []
     items = re_img.findall(html)
     for url,oo,xx in items:
-        if int(oo) >= 200 and int(xx) <= 30:
+        if int(oo) >= 150 and int(xx) <= 30:
             url_list.append(url)
     return url_list
 
@@ -37,16 +41,18 @@ def getCurrent():
     start_page = getHtml("http://jandan.net/ooxx")
     current = re.compile(r'<div class="comments">.*?<span class="current-comment-page">\[(\d+)\]</span>',re.S)
     page = current.findall(start_page)[0]
-    with open('page_num','w') as fd:
-        fd.write(str(page))
+    #s = mySQL()
+    s.put_num('page_num',page)
+    #with open('page_num','w') as fd:
+    #    fd.write(str(page))
     return page
 
-def getLast():
-    if os.path.exists('conf/page_num'):
-        with open('conf/page_num','r') as fd:
-            return fd.read()
-    else:
-        return getCurrent()
+#def getLast():
+#    if os.path.exists('conf/page_num'):
+#        with open('conf/page_num','r') as fd:
+#            return fd.read()
+#    else:
+#        return getCurrent()
 
 def save_img(url,name):
     if not os.path.exists('src/%s' %name):
@@ -60,7 +66,7 @@ def download(url_list):
         save_img(url,name)
 
 def main():
-    last_num = getLast()
+    last_num = s.get_num()
     current_num = getCurrent()
     list_pages = range(int(last_num),int(current_num)+1)
     print list_pages
@@ -70,3 +76,4 @@ def main():
         html = getHtml(url)
         url_list = getUrl_list(html)
         download(url_list)
+    s.close()
