@@ -28,7 +28,6 @@ class mySQL():
     def put_num(self,conf,num):
         self.cur.execute("UPDATE `jandan`.`configs` SET `info`=%s WHERE (`config`=%s)",[num, conf])
         self.conn.commit()
-        #self.close()
 
     def put_ooxx(self,num,url,oo,xx):
         self.cur.execute("INSERT INTO `jandan`.`ooxx` (`page_num`, `url`, `oo`, `xx`) SELECT %s, %s, %s, %s FROM dual WHERE NOT EXISTS (SELECT url FROM ooxx WHERE url = %s)",[num,url,oo,xx,url])
@@ -48,4 +47,4 @@ class mySQL():
 #    print l[1]
 #    print "_*" * 20
 #    s.put_num('page_num','2017')
-    #s.close()
+#    s.close()
