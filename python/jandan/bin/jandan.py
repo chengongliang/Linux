@@ -28,13 +28,13 @@ def getHtml(url):
     sys.exit(1)
 
 
-def getUrl_list(html):
+def getUrl_list(html,p):
     re_img = re.compile(r'<div class="text">.*?<p>.*?<a href="(http://ww.*?)".*?<div class="vote".*?<span id="cos_support.*?">(\d+)</span>.*?<span id="cos_unsupport.*?">(\d+)</span>', re.S)
     url_list = []
     items = re_img.findall(html)
     for url,oo,xx in items:
         if int(oo) >= 150 and int(xx) <= 30:
-            s.put_ooxx(url,oo,xx)
+            s.put_ooxx(p,url,oo,xx)
             url_list.append(url)
     return url_list
 
@@ -75,6 +75,6 @@ def main():
         url = 'http://jandan.net/ooxx/page-%s#comments' % p
         print "~~正在下载第%s页~~" % p
         html = getHtml(url)
-        url_list = getUrl_list(html)
+        url_list = getUrl_list(html,p)
         download(url_list)
     s.close()
