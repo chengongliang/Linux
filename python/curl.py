@@ -15,7 +15,6 @@ def main(url):
     c.setopt(pycurl.MAXREDIRS, 1)
     c.setopt(pycurl.DNS_CACHE_TIMEOUT, 30)
     indexfile = open(os.path.dirname(os.path.realpath(__file__)) + "/content.txt", "wb")
-    indexfile = open("/home/content.txt", "wb")
     c.setopt(pycurl.WRITEHEADER, indexfile)
     c.setopt(pycurl.WRITEDATA, indexfile)
 
