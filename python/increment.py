@@ -16,9 +16,9 @@ tables=[i for i in tables if i not in filters]
 
 today=date.today()
 
-#os.system("scp -P 58002 root@182.150.21.99:/home/hadoop4test/lastImportDat1111e /home/hadoop/")
+#os.system("scp -P 58002 root@182.150.*.*:/home/hadoop4test/lastImportDat1111e /home/hadoop/")
 
-RemoteServer69  = os.system("ssh -p 55556 root@182.150.21.99 pwd")
+RemoteServer69  = os.system("ssh -p 55556 root@182.150.*.** pwd")
 
 # 最近一次同步的日期
 f = open('/root/lastImportDate','r')
@@ -62,8 +62,8 @@ if RemoteServer69 == 0:
   os.system(copyCmd)
   os.system("mv /home/hadoop/increment_dump/" + yesterday.isoformat() + " /root/increment/")
   os.system("tar czf " + tarFile + " increment/" + yesterday.isoformat())
-  os.system("scp -P 55556 " + synTables + " root@182.150.21.99:/data/hecran/hbase/")
-  os.system("scp -P 55556 " + createTables + " root@182.150.21.99:/data/hecran/hbase/")
+  os.system("scp -P 55556 " + synTables + " root@182.150.*.*:/data/hecran/hbase/")
+  os.system("scp -P 55556 " + createTables + " root@182.150.*.*:/data/hecran/hbase/")
 else:
   os.system("echo \"RemoteServer [172.16.6.10] is down\" | /bin/mailx -s \"Hbase_dump OnLine ERROR\" biqin@tsinghuabigdata.com ")
   exit()
@@ -71,15 +71,15 @@ else:
 ScpStatus = 1
 count = 0
 while (ScpStatus != 0 & count < 5):
-  os.system("ssh -p 55556 root@182.150.21.99 \"mkdir -p /data/hecran/hbase/increment/\"")
-  ScpStatus = os.system("scp -P 55556 " + tarFile + " root@182.150.21.99:/data/hecran/hbase/increment/")
+  os.system("ssh -p 55556 root@182.150.*.* \"mkdir -p /data/hecran/hbase/increment/\"")
+  ScpStatus = os.system("scp -P 55556 " + tarFile + " root@182.150.*.*:/data/hecran/hbase/increment/")
   count = count + 1
 
 if(count != 5):
   os.system("rm -rf /root/increment/*")
   os.system("rm -rf " + tarFile)
   os.system("echo \"$(date +%Y-%m-%d) 01:00:00,000\" > /root/lastImportDate")
-  RunRemoteSH="ssh -p 55556 root@182.150.21.99 'bash /root/chenyao increment'"
+  RunRemoteSH="ssh -p 55556 root@182.150.*.* 'bash /root/chenyao increment'"
   os.system(RunRemoteSH)
 else:
   os.system("echo \"RemoteServer [172.16.6.10] count is 5\" | /bin/mailx -s \"Hbase_dump OnLine ERROR\" biqin@tsinghuabigdata.com")
