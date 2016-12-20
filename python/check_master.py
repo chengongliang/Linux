@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #_*_coding:utf8_*_
-'''根据哨兵提供的信息，检查对应 ip port 是否为 master 节点
+'''
+nagios 报警插件：
+根据哨兵提供的信息，检查对应 ip port 是否为 master 节点
 '''
 import sys
 import redis
