@@ -32,9 +32,9 @@ if tag and repo and dest:
         os.mkdir(dest)
     os.chdir(dest)
     data = commands.getstatusoutput("git remote -v")
-    if data[0] != 0:
-        print json.dumps({"failed": True, 'msg': 'git remote command failed'})
-        sys.exit(1)
+    # if data[0] != 0:
+    #     print json.dumps({"failed": True, 'msg': 'git remote command failed'})
+    #     sys.exit(1)
     if repo not in data[1]:
         init_data = commands.getstatusoutput("git clone %s ." % repo)
         if init_data[0] != 0:
