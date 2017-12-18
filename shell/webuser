@@ -88,10 +88,10 @@ case $1 in
     frontend) SRC=frontend && temname=tem-frontend-1 && webappdir=webapps/tem-rest-frontend ;;
     setting) SRC=tem-setting-1 && temname=tem-setting-1 && webappdir=webapps/tem-rest-officeSupport ;;
     resource) SRC=resourceManger && temname=tem-resource-1 && webappdir=webapps/tem-rest-resourceManager ;;
-    support) SRC==support.iclassedu.com-1&& temname=support.iclassedu.com-1 && webappdir=webapps/Service_platform ;;
+    support) SRC==support.test.com-1&& temname=support.test.com-1 && webappdir=webapps/Service_platform ;;
     order) SRC=support && temname=tem-order-1 && webappdir=webapps/tem-rest-support ;;
     witkey) SRC=tem-witkey-1 && temname=tem-witkey-1 && webappdir=webapps/tem-rest-crowdsourcing ;;
-    track ) SRC=flow_tracking && temname=track.iclassedu.com && webappdir=webapps/flow_tracking ;;	
+    track ) SRC=flow_tracking && temname=track.test.com && webappdir=webapps/flow_tracking ;;	
     * )  usage && exit;;
 esac
 backdir=/home/ifgsll/webuser/$temname

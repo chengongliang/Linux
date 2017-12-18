@@ -3,15 +3,15 @@
 source /etc/profile 2>&1>/dev/null
 remote=172.16.8.7
 wwwdir=/home/wwwroot
-backdir=/home/ifgsll/wwwroot/$1.iclassedu.com
+backdir=/home/ifgsll/wwwroot/$1.test.com
 #read -p "please input remoteserver:" remote
 
 usage(){
     echo -e """    include :order/resource/setting/tracking/upgrade/video/witkey/witkeymanager/www
     command :rsync/rollback
     input like:
-    \033[32m${0} www rsync     <= this will sync www.iclassedu.com from $remote =>\033[0m
-    \033[32m${0} www rollback  <= this will rollback www.iclassedu.com lastversion =>\033[0m
+    \033[32m${0} www rsync     <= this will sync www.test.com from $remote =>\033[0m
+    \033[32m${0} www rollback  <= this will rollback www.test.com lastversion =>\033[0m
     """
 }
 
@@ -29,7 +29,7 @@ backup(){
     version=`cat $backdir/last_version`
     newversion=$(($version+1))
     mkdir $backdir/release/$newversion
-    /usr/bin/rsync -ap  /home/wwwroot/$DST.iclassedu.com/ $backdir/release/$newversion
+    /usr/bin/rsync -ap  /home/wwwroot/$DST.test.com/ $backdir/release/$newversion
     ln -fsT $backdir/release/$newversion/ $backdir/last
     echo $newversion > $backdir/last_version
     cd $backdir/release/ || exit 15
@@ -42,15 +42,15 @@ rollback(){
     lastdate=`ls -l $backdir/last|awk '{print $6$7}'`
     echo -e "\033[32mThis will rollback to $lastdate's version\nPress any key to continue\033[0m"
     read -a roll
-    /usr/bin/rsync -avp --delete  $backdir/last/ /home/wwwroot/$DST.iclassedu.com/
+    /usr/bin/rsync -avp --delete  $backdir/last/ /home/wwwroot/$DST.test.com/
 }
 
 Rsync(){
     init
     backup
-    echo -e "\033[35mThis will rsync ${DST}.iclassedu.com from $remote\033[0m"
+    echo -e "\033[35mThis will rsync ${DST}.test.com from $remote\033[0m"
     read -p "Please press any key to continue" var
-    rsync -apv --delete  $remote:$wwwdir/$SRC.iclassedu.com/ $wwwdir/$DST.iclassedu.com/
+    rsync -apv --delete  $remote:$wwwdir/$SRC.test.com/ $wwwdir/$DST.test.com/
 }
 
 case ${1} in
