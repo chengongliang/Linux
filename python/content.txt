@@ -1,0 +1,15 @@
+HTTP/1.1 200 OK
+Date: Mon, 18 Dec 2017 07:33:00 GMT
+Server: Apache
+Last-Modified: Tue, 12 Jan 2010 13:48:00 GMT
+ETag: "51-47cf7e6ee8400"
+Accept-Ranges: bytes
+Content-Length: 81
+Cache-Control: max-age=86400
+Expires: Tue, 19 Dec 2017 07:33:00 GMT
+Connection: Keep-Alive
+Content-Type: text/html
+
+<html>
+<meta http-equiv="refresh" content="0;url=http://www.baidu.com/">
+</html>
