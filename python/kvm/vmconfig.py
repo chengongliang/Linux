@@ -2,6 +2,7 @@
 
 import re
 
+
 def match(s):
     re_name = re.compile(r"<name>(.*)</name>")
     re_disk = re.compile(r"<source file='(.*)'/>")
@@ -22,20 +23,21 @@ def match(s):
     elif vm_port:
         return {'port': vm_port.group(1)}
 
+
 def readConfs():
     import glob
     confs = glob.glob('/etc/libvirt/qemu/*.xml')
-    l = []
+    values = []
     for conf in confs:
         dic = {}
         with open(conf) as fd:
             for line in fd:
-                d = match(line)
-                if d:
-                    dic.update(d)
+                if match(line):
+                    dic.update(match(line))
         dic_tmp = {dic.pop('name'): dic}
-        l.append(dic_tmp)
-    return l
+        values.append(dic_tmp)
+    return values
+
 
 if __name__ == "__main__":
     print readConfs()
